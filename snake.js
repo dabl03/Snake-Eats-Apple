@@ -2,14 +2,14 @@
     @param {class Dim} : Clase que reprecenta las dimensiones: x, y, width, height. con extra de life(vida del personaje, opcional), address(direccion del personaje, opcional) y element(Por si necesita un contenedor de algun elemento, opcional.)
         - constructor: constructor(x,y,width,height,life=undefined,address=undefined,element=undefined);
         - funcion new_dim(dim): Acepta como parametro la misma clase Dim y retorna una nueva instancia de la clase Dim.
-    @param {class Snake} : Clase que define la cerpiente con la que se va a jugar.
+    @param {class Snake} : Clase que define la serpiente con la que se va a jugar.
         - constructor: constructor(dim,color);
-        - funcion draw: draw(canvas.getContext(2d)) o draw(ctx): Funcion encargada de dibujar toda la cola de la cerpiente, acepta como parametro el contexto 2d de la clase canvas usada actualmente.
+        - funcion draw: draw(canvas.getContext(2d)) o draw(ctx): Funcion encargada de dibujar toda la cola de la serpiente, acepta como parametro el contexto 2d de la clase canvas usada actualmente.
         - function updated_Dim(Dim,speed): Actualiza las coordenadas x e y de la instancia de la clase Dim deacuerdo a la variable address de la misma.
-        - function updated(speed,ctx): Actualiza toda la cola de la cerpiente y borra la cola de la pantalla, preparandola para la funcion draw que tu deberas llamar.
+        - function updated(speed,ctx): Actualiza toda la cola de la serpiente y borra la cola de la pantalla, preparandola para la funcion draw que tu deberas llamar.
         - function prototipe_updated(speed,ctx): Lo mismo que la funcion update, pero en teoria mas eficiente y confiable que la misma(Solo que no estoy muy seguro, por eso se llama prototipe_update o prototipe update).
         - function clear_all(ctx): Borra toda la cola.
-        - function create(speed): Aumenta el tamaño de la cola de la cerpiente.
+        - function create(speed): Aumenta el tamaño de la cola de la serpiente.
 */
 
 /**
@@ -46,7 +46,7 @@ class Snake{
         this.color=color;
     }
     /**
-        * draw: Dibujara todas las colas de la cerpiente.
+        * draw: Dibujara todas las colas de la serpiente.
         * @param: {ctx}: Contexto 2d del canvas.
         * @return {undefined}.
     */
@@ -95,35 +95,46 @@ class Snake{
         ctx.clearRect(this.dims[0].x,this.dims[0].y,this.dims[0].width,this.dims[0].height);
         for ( let i in this.dims ){
             let last=this.dims[i].address;//Ultimos address
+            
+            //Complovamos que la serpiente si la serpiente toca su cola enviamos el indice que indica la posicion.
+            if( primer.x==now.x && primer.y==now.y ){
+                return i;
+            }
+            
             this.updated_Dim(this.dims[i],speed);//Actualizamos la posicion deacuerdo al address actual.
+            
             /*Recuerda eliminaras la variable previous;).*/
             this.dims[i].address=dir_now;//Actualizamos nuestro address actual
+            
             dir_now=last;//Y vamos a preparar address de la siguente cola.
         }
+        return 0;
     }
     /**
         * prototipe_updated: Es un prototipo del la funcion actualizar.
     */
     prototipe_updated(speed,ctx){
-        let primer=this.dims[0];//Recuerda la cerpientes no deben morder su cola por lo que debes usar esto con un if para saber si la cola se mordio a si misma.
+        let primer=this.dims[0];//Recuerda la serpientes no deben morder su cola por lo que debes usar esto con un if para saber si la cola se mordio a si misma.
         let the_last_dim=Dim.new_dim(primer);//Para actualizar la posicion de la cola siguiente.
-        
         ctx.clearRect(primer.x,primer.y,primer.width,primer.height);
         
         this.updated_Dim(primer,speed);//Actualizamos la cabeza de la cola.
-        
         for ( let i=1;i<this.dims.length;i++ ){//Revisar si funcionaria igual si el valor de i se inicia en 0.
             let now=this.dims[i];//Solo un resumen de la pocision actual.
             let last=Dim.new_dim(now);
             
             ctx.clearRect(now.x,now.y,now.width,now.height);
+            //Complovamos que la serpiente si la serpiente toca su cola enviamos el indice que indica la posicion.
+            if( primer.x==now.x && primer.y==now.y ){
+                return i;
+            }
             
             //Nota: para actualizar la posicion actual no uses la variable now.
             this.dims[i]=Dim.new_dim(the_last_dim);//Actualizamos la pocicion de la cola actual con la posicion anterior de la cola antes de la actual para crear un efecto cadena.
             the_last_dim=last;//Para actualizar la posicion de la cola siguiente.
             
-            ///@todo Colocar un if aqui.
         }
+        return 0;
     }
     /**
         * clear_all: Limpiamos todas las colas pasadas de este canvas.
@@ -161,4 +172,4 @@ class Snake{
         }
     }
     
-}
+};
