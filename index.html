@@ -4,111 +4,15 @@
         <title>Snake.</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" type="text/css" href="./Snake.css"/>
         <style>
-            html{
-                --color-botton-menu-inicial:#ffea00;
-                --color-botton-menu-inicial-hover:#ff6;
-                --border-color-botton-menu-inicial:#000;
-                --border-color-botton-menu-inicial-hover:#aaa;
-                --color-transparent:rgba(0,0,0,0);
-                --max-width:98vw;
-                --max-height:97vh;
-            }
-            body{
-                background-color:#00f;
-            }
-            #game-container{
-                display:none;
-            }
-            #game{
-                background-color:#2693ff;
-                position:absolute;
-            }
-            .tapar-game{
-                display:none;
-                position:absolute;/*Recuerda game y tapar-game deben estar en position absolute para que esten en el mismo lado.*/
-                background-color:rgba(0,0,0,0.6);
-                z-index:1;
-                justify-content:center;
-                align-content:center;
-                flex-direction:column;
-                text-align:center;
-                font-size:1.5em;
-            }
-            #msg-pause-game{
-                color:white;
-            }
-            #game-over{
-                background-image:url("./img/game-over.png");
-            }
-            #init{
-                background-color:#00f;
-                width:var(--max-width,98vw);
-                height:var(--max-height,97vw);
-            }
-            #init #logo{
-                background-image:#2693ff;
-                width:var(--max-width,98vw);
-                height:40vh;
-                border:2px solid black;
-                margin-bottom:4px;
-            }
-            #init #logo img{
-                width:100%;
-                height:100%;
-            }
-            #init #logo h1{
-                position:fixed;
-                top:5%;
-                left:35.15%;
-                color:yellow;
-            }
-            #menu-inicial{
-                width:var(--max-width,98vw);
-                text-align:center;
-            }
-            .menu-inicia-button{
-                background-color:var(--color-botton-menu-inicial,#ffea00);
-                border-color:var(--border-color-botton-menu-inicial,#000);
-                padding-left:5%;
-                padding-right:5%;
-                padding-bottom:2%;
-                padding-top:2%;
-                text-align:center;
-            }
-            .menu-inicia-button:hover{
-                background-color:var(--color-botton-menu-inicial-hover,#ff6);
-                border-color:var(--border-color-botton-menu-inicial-hover,#000);
-                
-            }
-            #help{
-                display:none;
-            }
-            #return-to-init{
-                display:none;
-                background-image:linear-gradient(to bottom,#000 40%,#3b3b3b,#777,#b9b9b9,#fff);
-                color:white;
-            }
-            #return-to-init-button{
-                background-color:var(--color-transparent);
-                border-color:var(--color-transparent);
-                color:white;
-                font-size:3em;
-            }
-            #return-to-init-button:hover{
-                color:#ff2;
-            }
-            #return-to-init #center{
-                margin-left:37vw;
-                font-size:3em;
-            }
         </style>
     </head>
     <body>
         <div id="init">
             <!--La precentacion del juego.-->
             <div id="logo">
-                <img src="./img/logo-cerpiente-come-manzana.png" alt="cerpiente-logo."/>
+                <img src="./img/logo-serpiente-come-manzana.png" alt="serpiente-logo."/>
                 <h1>Cerpiente Come Manzana.</h1>
             </div>
             <div id="menu-inicial">
@@ -134,8 +38,8 @@
             <div id="msg-pause-game" onclick="reanuda_juego(this);" class="tapar-game">
                 <span>Vuelva a precionar P para reanudar el juego o haga click aqui.</span>
             </div>
-            <div id="game-over" class="tapar-game">
-                <span>GAME-OVER.</span>
+            <div id="game-over" class="tapar-game" onclick="game_over(false);">
+                <h2>GAME-OVER.</h2>
             </div>
             <div id="controles-game">
                 
@@ -168,15 +72,15 @@
             /**
                 @param {class Dim} : Clase que reprecenta las dimensiones: x, y, width, height. con extra de life(vida del personaje, opcional), address(direccion del personaje, opcional) y element(Por si necesita un contenedor de algun elemento, opcional.)
                     - constructor: constructor(x,y,width,height,life=undefined,address=undefined,element=undefined);
-                    - funcion new_dim(dim): Acepta como parametro la misma clase Dim y retorna una nueva instancia de la clase Dim.
-                @param {class Snake} : Clase que define la cerpiente con la que se va a jugar.
+                    - function new_dim(dim): Acepta como parametro la misma clase Dim y retorna una nueva instancia de la clase Dim.
+                @param {class Snake} : Clase que define la serpiente con la que se va a jugar.
                     - constructor: constructor(dim,color);
-                    - funcion draw: draw(canvas.getContext(2d)) o draw(ctx): Funcion encargada de dibujar toda la cola de la cerpiente, acepta como parametro el contexto 2d de la clase canvas usada actualmente.
+                    - function draw: draw(canvas.getContext(2d)) o draw(ctx): Funcion encargada de dibujar toda la cola de la serpiente, acepta como parametro el contexto 2d de la clase canvas usada actualmente.
                     - function updated_Dim(Dim,speed): Actualiza las coordenadas x e y de la instancia de la clase Dim deacuerdo a la variable address de la misma.
-                    - function updated(speed,ctx): Actualiza toda la cola de la cerpiente y borra la cola de la pantalla, preparandola para la funcion draw que tu deberas llamar.
+                    - function updated(speed,ctx): Actualiza toda la cola de la serpiente y borra la cola de la pantalla, preparandola para la funcion draw que tu deberas llamar.
                     - function prototipe_updated(speed,ctx): Lo mismo que la funcion update, pero en teoria mas eficiente y confiable que la misma(Solo que no estoy muy seguro, por eso se llama prototipe_update o prototipe update).
                     - function clear_all(ctx): Borra toda la cola.
-                    - function create(speed): Aumenta el tamaño de la cola de la cerpiente.
+                    - function create(speed): Aumenta el tamaño de la cola de la serpiente.
             */
         </script>
         <script>
@@ -190,6 +94,7 @@
                   SQUAL=0,
                   MAYOR=1,
                   MENOR=-1,
+                  ENTER=13,
                   MAX_WIDTH_CANVAS=screen.availWidth-((screen.availWidth*20)/100),
                   MAX_HEIGHT_CANVAS=screen.availHeight-((screen.availHeight*25)/100),
                   FUNCTION_TRUE=function(){return true;};
@@ -203,9 +108,9 @@
                 snake,//serpiente actual.
                 manzana=[],//Manzanas creadas.
                 function_for_return=FUNCTION_TRUE,//Sera llamada al principio de la funcion return_for_previous, para personaliza, liberar o detener los intervalos pranificado para la ejecucion del juego.
-                game_run=false,
                 is_pause=false,
                 time_game=200,
+                is_game_over=false;
                 time_create_apple=5000;
             ///@todo: crear una clase manzanas y unas constantes que definen sus abilidades y su comportamientos:
             ///- Muerte: Quita puntos y una cola del jugador: Debe ser de color negro.
@@ -226,21 +131,28 @@
             
             //FUNCIONES:
             window.onload=function(){
+                let canvas_container=document.getElementById("game-container");
                 let canvas=document.getElementById("game");
                 let pause_game=document.getElementById("msg-pause-game");
+                let game_over_ELEMENT=document.getElementById("game-over");
                 //ponemos el canvas del tamaño de la pantalla.
                 //Nota quiero ponerlo mas pequeño y agregar mas detalles a la precentacion.
                 canvas.setAttribute("width",MAX_WIDTH_CANVAS);
                 canvas.setAttribute("height",MAX_HEIGHT_CANVAS);
-                //Asemos que el contenedor de pausa ocupe todo el canvas.
-                pause_game.style.width=MAX_WIDTH_CANVAS+"px";
-                pause_game.style.height=MAX_HEIGHT_CANVAS+"px";
+                //Hacemos que el contenedor de pausa ocupe todo el canvas.
+                /*pause_game.style.width=MAX_WIDTH_CANVAS+"px";
+                pause_game.style.height=MAX_HEIGHT_CANVAS+"px";*/
+                canvas_container.style.setProperty("--MAX-WIDTH-CANVAS",MAX_WIDTH_CANVAS+"px")
+                canvas_container.style.setProperty("--MAX-HEIGHT-CANVAS",MAX_HEIGHT_CANVAS+"px")
                 ///@todo Hacer que esta funcion se use por todos los eventos y darle una adaptacion especial a evento touch.
                 canvas.addEventListener("mousemove",function(event){
                     let dim=snake.dims[0];
-                    //Creamos un flag que dira si el mous esta menos o mayor o igual a la posicion X y Y de la cerpiente.
-                    let is_x=(dim.x==event.clientX)?SQUAL:(dim.x>event.clientX)?MAYOR:MENOR;
-                    let is_y=(dim.y==event.clientY)?SQUAL:(dim.y>event.clientY)?MAYOR:MENOR;
+                    if(is_game_over){
+                        return;
+                    }
+                    //Creamos un flag que dira si el mous esta menos o mayor o igual a la posicion X y Y de la serpiente.
+                    let is_x=(dim.x==event.clientX)?SQUAL:(event.clientX>dim.x)?MAYOR:MENOR;//MAYOR significa RIGHT.
+                    let is_y=(dim.y==event.clientY)?SQUAL:(event.clientY>dim.y)?MAYOR:MENOR;//Mayor significa BOTTOM.
                     if (is_x && is_y){//Si no son iguales.
                         if (is_x>is_y){//BOTTOM | LEFT
                             //Sedemos el control a BOTTOM o a LEFT.
@@ -270,18 +182,19 @@
                         return false;
                     }
                     function_for_return=FUNCTION_TRUE;//Como sera llamado cade vez que el usuario regrese a la pantalla principal debemos darle una funcion vacia.
-                    game_run=false;//detenemos la funcion recursiva que crea manzanas.
-                    clearInterval(interval_game);//Detenemos el juego.
-                    clearInterval(interval_manzana);
-                    snake=0;//Lanzamos toda la cerpiente al recolector de basura para que la libere y a su cola.;)
-                    manzana=[];//Liberamos el array manzanas.
-                    ctx.clearRect(0,0,MAX_WIDTH_CANVAS,MAX_HEIGHT_CANVAS);
-                    
+                    //Liberamos la memoria inecesaria.
+                    game_over(true);                 
                     return true;
                 }
                 document.body.addEventListener("keydown",function(e){
                     /***@todo: hacer que cuando se regrese del juego este evento cambie a otro que controle los botones.*/
                     e.keyCode=(e.keyCode>='A' && e.keyCode<='Z')?(95-e.keyCode)+32:e.keyCode;
+                    if (is_game_over){
+                        if (e.keyCode==ENTER){
+                            game_over(false);
+                        }
+                        return;
+                    }
                     switch(e.keyCode){
                         case LEFT://Tecla de la frecha izquierda o key left.
                             snake.dims[0].address=LEFT;
@@ -297,7 +210,7 @@
                             break;
                         case PAUSE://tecla p que la trataremos como Pausa.
                             let pause=document.getElementById("msg-pause-game");
-                            game_run=is_pause;
+                            
                             if (is_pause){//Si esta en pausa reanudamos el juego.
                                 reanuda_juego(pause);
                             }else{//Si no pausamos el juego.
@@ -311,30 +224,20 @@
                             alert(e.keyCode);
                     }
                 });
-                //Iniciamos todo el juego.
-                init_all();
+                game_over(false);
             }
             function reanuda_juego(this_){
                 interval_manzana=setInterval(create_manzana,time_create_apple);
                 interval_game=setInterval(game,time_game);//Iniciamos el juego.
-                game_run=true;
+                
                 is_pause=false;
                 this_.style.display="none";
             }
-            function init_all(){
-                
-                game_run=true;
-                //Creamos la primera manzana.
-                create_manzana();//Iniciamos la funcion que crea manzanas.
-                interval_manzana=setInterval(create_manzana,time_create_apple);
-                //Ponemos a la cerpiente al la mita de la pantalla.
-                ///@todo Ver si se puede aumentar el tamaño de la cerpiente y no te olvides de aalterar la velocidad en la funcion game.
-                snake=new Snake(new Dim(screen.availWidth>>1,screen.availHeight>>1,10,10,3,RIGHT),"green");//El jugador actual.
-                interval_game=setInterval(game,time_game);//Iniciamos el juego.
-            }
             function game(){
-                //Actualizamos la cerpiente-
-                snake.prototipe_updated(10,ctx);
+                //Actualizamos la serpiente-
+                if ( snake.prototipe_updated(10,ctx) ){
+                    game_over(true);
+                }
                 
                 ctx.beginPath();
                 ctx.fillStyle="red";
@@ -343,21 +246,23 @@
                     snake.dims[0].x<manzana[i].x+manzana[i].width ) &&
                     
                     (snake.dims[0].y>manzana[i].y-manzana[i].height &&
-                    snake.dims[0].y<manzana[i].y+manzana[i].height) ){//Eliminamos la manzana y subimos de nivel a la cerpiente.
+                    snake.dims[0].y<manzana[i].y+manzana[i].height) ){//Eliminamos la manzana y subimos de nivel a la serpiente.
                         snake.create(10);
                         ctx.clearRect(manzana[i].x,manzana[i].y,manzana[i].width,manzana[i].height);
                         clearInterval(interval_manzana);//Recuerda que debemos eliminar todo rastro del indice por lo que debemos eliminar la proxima llamada a interval.
                         manzana=remove_indice(manzana,i);
                         interval_manzana=setInterval(create_manzana,time_create_apple);//Reanudamos la creacion de manzanas.
-                        alert("yumin")///@todo Cambiar esta alerta por un dibujo de una cerpiente diciendo esto comiendo una manzana.
+                        alert("yumin")///@todo Cambiar esta alerta por un dibujo de una serpiente diciendo esto comiendo una manzana.
                         break;
                     }
                     ctx.fillRect(manzana[i].x,manzana[i].y,manzana[i].width,manzana[i].height);//Dibujamos a nuestra manzana actual.
                 }
                 ctx.closePath();
                 ctx.fill();
-                snake.draw(ctx);//Dibujamos a nuestra cerpiente.
-                
+                snake.draw(ctx);//Dibujamos a nuestra serpiente.
+                if ( snake.dims[0].x>MAX_WIDTH_CANVAS || snake.dims[0].x<0 || snake.dims[0].y>MAX_HEIGHT_CANVAS || snake.dims[0].y<0 ){
+                    game_over(true);
+                }
             }
             function create_manzana(){
                 let dim=new Dim(Math.floor(Math.random()*MAX_WIDTH_CANVAS),
@@ -406,6 +311,31 @@
                 document.getElementById(id_menu_return).style.display="block";
                 id_previous=now;
                 id_now="help";
+            }
+            function game_over(IS_GAME_OVER,configure=undefined){
+                let this_=document.getElementById("game-over");
+                is_game_over=IS_GAME_OVER;
+                if (IS_GAME_OVER){
+                    this_.style.display="flex";
+                    clearInterval(interval_game);
+                    clearInterval(interval_manzana);
+                    //Limpiamos el canvas.
+                    ctx.clearRect(0,0,MAX_WIDTH_CANVAS,MAX_HEIGHT_CANVAS);
+                    //Vaciamos la memoria.
+                    snake=0;
+                    manzana=[];
+                }else{
+                    this_.style.display="none";
+                    //Iniciamos otra vez el juego.
+                    ///@todo Ver si se puede aumentar el tamaño de la serpiente y no te olvides de aalterar la velocidad en la funcion game.
+                    snake=new Snake(new Dim(MAX_WIDTH_CANVAS>>1,MAX_HEIGHT_CANVAS>>1,10,10,3,RIGHT),"green");//El jugador actual.
+                    //Creamos la primera manzana.
+                    create_manzana();//Iniciamos la funcion que crea manzanas.
+                    interval_manzana=setInterval(create_manzana,time_create_apple);
+                    //Ponemos a la serpiente al la mita de la pantalla.
+                    interval_game=setInterval(game,time_game);//Iniciamos el juego.
+                }
+                
             }
         </script>
     </body>
