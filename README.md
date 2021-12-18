@@ -35,3 +35,8 @@
     <li>dabl03.</li>
   </ul>
 </p>
+
+### Licencia
+<p>
+  <a href="https://github.com/dabl03/Snake-Eats-Apple/blob/main/LICENSE">Apache License 2.0</a>
+</p>
