@@ -11,7 +11,18 @@
         - function clear_all(ctx): Borra toda la cola.
         - function create(speed): Aumenta el tamaño de la cola de la serpiente.
 */
-
+function remove_indice(last_array,delete_indice){
+    let new_array=[];
+    let i_new_array=0;//Indice del nuevo array.
+    for (let i in last_array){
+        if ( i==delete_indice ){
+            continue;
+        }
+        new_array[i_new_array]=last_array[i];
+        i_new_array++;
+    }
+    return new_array;
+}
 /**
     * Dim: Funcion que reprecenta las dimensiones de un objeto y su vida y su direccion, tambien el objeto como tal.
     * @param x: Variable que reprecenta la posicion x de la pantalla.
@@ -40,10 +51,14 @@ Dim.new_dim=function(dim){
     return new Dim(dim.x,dim.y,dim.width,dim.height,dim.life,dim.address,dim.element);
 }
 class Snake{
-    constructor(dim,color){
+    constructor(dim,color,score=0,life=3){
         this.dims=[Dim.new_dim(dim)];
         this.now_address=dim.address;
         this.color=color;
+        this.score=score;
+        this.is_ghost=false;
+        this.color_ghost="white";
+        this.life=life;
     }
     /**
         * draw: Dibujara todas las colas de la serpiente.
@@ -53,7 +68,7 @@ class Snake{
     draw(ctx){
         let fill=ctx.fillStyle;
         ctx.beginPath();
-        ctx.fillStyle=this.color;
+        ctx.fillStyle=(this.is_ghost)?this.color_ghost:this.color;
         for ( let dim of this.dims ){
             ///@todo: crear un circulo con cada dimension.
             ctx.fillRect(dim.x,dim.y,dim.width,dim.height);
@@ -90,14 +105,14 @@ class Snake{
         * @param {ctx}: Contexto 2d del canvas actual.
         * @return {undefined.}                    
     **/
-    updated(speed,ctx){
+    updated(speed,is_ghost,ctx){
         let dir_now=this.dims[0].address;
         ctx.clearRect(this.dims[0].x,this.dims[0].y,this.dims[0].width,this.dims[0].height);
         for ( let i in this.dims ){
             let last=this.dims[i].address;//Ultimos address
             
             //Complovamos que la serpiente si la serpiente toca su cola enviamos el indice que indica la posicion.
-            if( primer.x==now.x && primer.y==now.y ){
+            if( !this.is_ghost & primer.x==now.x && primer.y==now.y ){
                 return i;
             }
             
@@ -113,7 +128,7 @@ class Snake{
     /**
         * prototipe_updated: Es un prototipo del la funcion actualizar.
     */
-    prototipe_updated(speed,ctx){
+    prototipe_updated(speed,is_ghost,ctx){
         let primer=this.dims[0];//Recuerda la serpientes no deben morder su cola por lo que debes usar esto con un if para saber si la cola se mordio a si misma.
         let the_last_dim=Dim.new_dim(primer);//Para actualizar la posicion de la cola siguiente.
         ctx.clearRect(primer.x,primer.y,primer.width,primer.height);
@@ -125,7 +140,7 @@ class Snake{
             
             ctx.clearRect(now.x,now.y,now.width,now.height);
             //Complovamos que la serpiente si la serpiente toca su cola enviamos el indice que indica la posicion.
-            if( primer.x==now.x && primer.y==now.y ){
+            if( !this.is_ghost & primer.x==now.x && primer.y==now.y ){
                 return i;
             }
             
@@ -172,4 +187,23 @@ class Snake{
         }
     }
     
+};
+class Apple{
+    constructor(dim,type,color){
+        this.dim=dim;
+        this.type=type;
+        this.color=color;
+    }
+}
+Apple.draw=function(apple,ctx){
+    let fillStyle=ctx.fillStyle;//Para retaurar el style anterior del ctx.
+    ctx.beginPath();
+    ctx.fillStyle=apple.color;
+    ctx.fillRect(apple.dim.x,apple.dim.y,apple.dim.width,apple.dim.height);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle=fillStyle;
+};
+Apple.delete_=function(apple_dim,ctx){
+    ctx.clearRect(apple_dim.x,apple_dim.y,apple_dim.width,apple_dim.height);
 };
