@@ -85,47 +85,84 @@
         </script>
         <script>
             //Constantes:
-            //Direcciones:
-            const TOP=38,
-                  BOTTOM=40,
-                  LEFT=37,
-                  RIGHT=39,
-                  PAUSE=80,
-                  SQUAL=0,
-                  MAYOR=1,
-                  MENOR=-1,
-                  ENTER=13,
-                  MAX_WIDTH_CANVAS=screen.availWidth-((screen.availWidth*20)/100),
-                  MAX_HEIGHT_CANVAS=screen.availHeight-((screen.availHeight*25)/100),
-                  FUNCTION_TRUE=function(){return true;};
-            
-            //glovales:
-            var id_previous="init",
-                id_now="init",
+            const 
+                /*Direcciones:*/
+                    TOP=38,
+                    BOTTOM=40,
+                    LEFT=37,
+                    RIGHT=39,
+                /*Flags:*/
+                    PAUSE=80,
+                    SQUAL=0,
+                    MAYOR=1,
+                    MENOR=-1,
+                    ENTER=13,
+                /*Dimensiones:*/
+                    MAX_WIDTH_CANVAS=screen.availWidth-((screen.availWidth*20)/100),
+                    MAX_HEIGHT_CANVAS=screen.availHeight-((screen.availHeight*25)/100),
+                /*Times:*/
+                    TIME_GHOST=20000,//El tiempo que la serpiente permanecerá siendo fanstasma durante el juego.
+                    TIME_BONUS=100,/*Es para definir el tiempo en que cada manzana se creará las manzanas en tiempo de bono.*/
+                    MAX_TIME_BONUS=8000,/*El tiempo maximo en que durara el bono de las manzanas.*/
+                /*Funciones:*/
+                    FUNCTION_TRUE=function(){return true;}/*Funcion que siempre debuelve true.;)*/
+            ;
+            //global:
+            var id_previous="init",/*Para saber cual ha sido la actividad anterior: inicio, pausa, juego, instrucciones, etc... .*/
+                id_now="init",/*Para saber cual ha sido la actividad siguiente: inicio, pausa, juego, instrucciones, etc... .*/
+                
                 ctx,//Importante: Contexto 2d del canvas y se inicia en window.onload.
+                
                 interval_game,//Variable que contendrá el id del intervalo del juego actual.
-                interval_manzana,//Variable que contendrá el id del intervalo de la creacion de la manzanas.
+                
                 snake,//serpiente actual.
                 manzana=[],//Manzanas creadas.
+                
                 function_for_return=FUNCTION_TRUE,//Sera llamada al principio de la funcion return_for_previous, para personaliza, liberar o detener los intervalos pranificado para la ejecucion del juego.
-                is_pause=false,
-                time_game=200,
-                is_game_over=false;
-                time_create_apple=5000;
-            ///@todo: crear una clase manzanas y unas constantes que definen sus abilidades y su comportamientos:
-            ///- Muerte: Quita puntos y una cola del jugador: Debe ser de color negro.
-            ///- Fanstasma: Color blanco: Hace que la serpiente pueda atrabesar todo y recuerda hacer que no pueda atravesar las barandas.
-            ///- Rocas: je: Color marron: Hace que pierda una vida.
-            ///- Corazon rosado: color Rosa: Hace que retaure una vida(rara).
-            ///- Manzana: Color rojo: Hace que gane una cola y aumenta el puntaje.
-            ///- Bonus: Color orange: Hace que el interval_gameo de tiempo de la creacion de la manzana se redusca considarablemente.
+                
+                is_pause=false,/*Si el juego esta en pausa esta variable se encargará que nada se ejecute.*/
+                is_game_over=false,/*Si el juego termino o no.*/
+                
+                time_game=200,/*Tiempo de retraso en que se movera la serpiente.*/
+                time_create_apple=3500/*Tiempo de retraso para que se cree la manzanas. Nota: Esta variable se cambiará si la serpiente come una manzana bonus.*/
+            ;
+            /*TYPE APPLES:*/
+            const APPLE_NORMAL=0,
+                  APPLE_DEATH=1,
+                  APPLE_GHOST=2,
+                  APPLE_ROCK=3,
+                  APPLE_PINK_HEART=4,
+                  APPLE_BONUS=5,
+                  APPLE_MAX_TYPE=6;/*Es para poner un limite al random type apple. Nota: Se debe actualizar cada  vez que se agrege una manzana.*/
+            /*Funciones y variables Apple personalizadas:*/
+            Apple.is_bonus=false;//Para saber si estamos en tiempo de bono.
+            Apple.interval=0;//Variable que contendrá el id del intervalo de la creacion de la manzanas.
+            Apple.get_color={};//Con esto decidiremos cual color tendra la manzanas. Nota: No intente iniciarlo en el momento de declararlo, porque en vez de agarrar el valor de las variables constantes agarra el nombre como clave, y lo que queremos es que agarre el valor como clave.
+            //Begin get_color:
+                Apple.get_color[APPLE_NORMAL]="red";
+                Apple.get_color[APPLE_DEATH]="black";
+                Apple.get_color[APPLE_GHOST]="white";
+                Apple.get_color[APPLE_ROCK]="brown";
+                Apple.get_color[APPLE_PINK_HEART]="pink";
+                Apple.get_color[APPLE_BONUS]="orange";
+            //End get_color
+            Apple.create_interval=function(){/*Lla estoy fastidiado de tener que repetir esta linea de codigo*/
+                Apple.interval=setInterval(Apple.create_manzana,(Apple.is_bonus)?TIME_BONUS:time_create_apple);
+            }
+            /*@todo en la parte donde se verifica si la serpiente toco una manzana agregarle los poderes con un switch.*/
+            
+            /****
+                * @todo: Hacer una barra de herramientas en la parte derecha del canvas que simbolize el estado de la serpiente.
+                * @todo: Hacer un dibujo de una serpiente feliz porque caen muchas manzanas rojas y ponerla en el estado cuando este Apple.is_bonus activo.
+                * @todo: Hacer lo mismo con la snake.is_ghost y un dibujo de una serpiente blanca.
+                * @todo: Preparar una buena documentacion con todas las funciones y clases de este juego.
+            */
             
             ///@todo : Cambiar esta funcion para alvegar a un menu que de la siguientes opciones:
             ///- Iniciar el juego.
             ///- Help: Cuadro que indica como jugar el juego.
             ///- Configure:; Configuraciones. @todo: Pensar cuales.
             ///- Save: Guardar el puntaje y las configuraciones.
-            
         </script>
         <script>
             
@@ -145,22 +182,17 @@
                 canvas_container.style.setProperty("--MAX-WIDTH-CANVAS",MAX_WIDTH_CANVAS+"px")
                 canvas_container.style.setProperty("--MAX-HEIGHT-CANVAS",MAX_HEIGHT_CANVAS+"px")
                 ///@todo Hacer que esta funcion se use por todos los eventos y darle una adaptacion especial a evento touch.
-                canvas.addEventListener("mousemove",function(event){
+                canvas.addEventListener("mousemove",function(e){
                     let dim=snake.dims[0];
-                    if(is_game_over){
-                        return;
-                    }
-                    //Creamos un flag que dira si el mous esta menos o mayor o igual a la posicion X y Y de la serpiente.
-                    let is_x=(dim.x==event.clientX)?SQUAL:(event.clientX>dim.x)?MAYOR:MENOR;//MAYOR significa RIGHT.
-                    let is_y=(dim.y==event.clientY)?SQUAL:(event.clientY>dim.y)?MAYOR:MENOR;//Mayor significa BOTTOM.
-                    if (is_x && is_y){//Si no son iguales.
-                        if (is_x>is_y){//BOTTOM | LEFT
-                            //Sedemos el control a BOTTOM o a LEFT.
-                            dim.address=( dim.y-event.clientY<event.clientX-dim.x )?BOTTOM:LEFT;
-                        }else{//TOP | RIGHT
-                            //Sedemos el control a TOP o a RIGHT.
-                            dim.address=( event.clientY-dim.y<dim.x-event.clientX )?TOP:RIGHT;
-                        }
+                    //Creamos un flag que dirá si el mous esta menor o igual a la posición X y Y de la serpiente.
+                    let is_x=(dim.x==e.clientX)?SQUAL:(e.clientX>dim.x)?MAYOR:MENOR;//Mayor significa RIGHT
+                    let is_y=(dim.y==e.clientY)?SQUAL:(e.clientY>dim.y)?MAYOR:MENOR;//Mayor significa BOTTOM.
+                    let dis_x=(is_x==MAYOR)?e.clientX-dim.x:dim.x-e.clientX;
+                    let dis_y=(is_y==MAYOR)?e.clientY-dim.y:dim.y-e.clientY;
+                    if (dis_x>dis_y){
+                        dim.address=(is_x==MAYOR)?RIGHT:LEFT;
+                    }else{
+                        dim.address=(is_y==MAYOR)?BOTTOM:TOP;
                     }
                 });
                 
@@ -215,7 +247,7 @@
                                 reanuda_juego(pause);
                             }else{//Si no pausamos el juego.
                                 clearInterval(interval_game);
-                                clearInterval(interval_manzana);
+                                clearInterval(Apple.interval);
                                 pause.style.display="flex";
                                 is_pause=true;
                             }
@@ -227,67 +259,60 @@
                 game_over(false);
             }
             function reanuda_juego(this_){
-                interval_manzana=setInterval(create_manzana,time_create_apple);
+                Apple.create_interval();
                 interval_game=setInterval(game,time_game);//Iniciamos el juego.
-                
                 is_pause=false;
                 this_.style.display="none";
             }
             function game(){
                 //Actualizamos la serpiente-
-                if ( snake.prototipe_updated(10,ctx) ){
+                if ( snake.prototipe_updated(10,Apple.is_nake_ghost,ctx) ){
                     game_over(true);
                 }
-                
                 ctx.beginPath();
                 ctx.fillStyle="red";
                 for (let i in manzana){
-                    if (( snake.dims[0].x>manzana[i].x-manzana[i].width &&
-                    snake.dims[0].x<manzana[i].x+manzana[i].width ) &&
                     
-                    (snake.dims[0].y>manzana[i].y-manzana[i].height &&
-                    snake.dims[0].y<manzana[i].y+manzana[i].height) ){//Eliminamos la manzana y subimos de nivel a la serpiente.
-                        snake.create(10);
-                        ctx.clearRect(manzana[i].x,manzana[i].y,manzana[i].width,manzana[i].height);
-                        clearInterval(interval_manzana);//Recuerda que debemos eliminar todo rastro del indice por lo que debemos eliminar la proxima llamada a interval.
+                    if (( snake.dims[0].x>manzana[i].dim.x-manzana[i].dim.width &&
+                    snake.dims[0].x<manzana[i].dim.x+manzana[i].dim.width ) &&
+                    
+                    (snake.dims[0].y>manzana[i].dim.y-manzana[i].dim.height &&
+                    snake.dims[0].y<manzana[i].dim.y+manzana[i].dim.height) ){//Eliminamos la manzana y subimos de nivel a la serpiente.
+                        
+                        if ( Apple.power(manzana[i]) ){//Creamos el efecto de la manzana actual.
+                            //Ya el jugador ha perdido todas sus vidas.
+                            game_over(true);
+                            return;//Terminamos el juego.
+                        }
+                        Apple.delete_(manzana[i].dim,ctx);//Borramos la manzanas del lienzo.
+                        clearInterval(Apple.interval);//Para evitar indices nulo reiniciamos la creacion de manzanas.
+                        
                         manzana=remove_indice(manzana,i);
-                        interval_manzana=setInterval(create_manzana,time_create_apple);//Reanudamos la creacion de manzanas.
-                        alert("yumin")///@todo Cambiar esta alerta por un dibujo de una serpiente diciendo esto comiendo una manzana.
+                        Apple.create_interval();//Reanudamos la creacion de manzanas.
                         break;
                     }
-                    ctx.fillRect(manzana[i].x,manzana[i].y,manzana[i].width,manzana[i].height);//Dibujamos a nuestra manzana actual.
+                    Apple.draw(manzana[i],ctx);//Dibujamos a nuestra manzana actual.
                 }
                 ctx.closePath();
                 ctx.fill();
                 snake.draw(ctx);//Dibujamos a nuestra serpiente.
-                if ( snake.dims[0].x>MAX_WIDTH_CANVAS || snake.dims[0].x<0 || snake.dims[0].y>MAX_HEIGHT_CANVAS || snake.dims[0].y<0 ){
+                if ( !snake.is_ghost & snake.dims[0].x>MAX_WIDTH_CANVAS || snake.dims[0].x<0 || snake.dims[0].y>MAX_HEIGHT_CANVAS || snake.dims[0].y<0 ){
                     game_over(true);
                 }
             }
-            function create_manzana(){
-                let dim=new Dim(Math.floor(Math.random()*MAX_WIDTH_CANVAS),
-                            Math.floor(Math.random()*MAX_HEIGHT_CANVAS),
-                            10,
-                            10);
-                //Para evitar el error de que el juego me ingrese un indice undefined cuando se crea la primera manzana comprovamos si se está iniciando o nó el juego.
-                manzana[manzana.length]=dim;
-                ctx.beginPath();
-                ctx.fillStyle="red";
-                ctx.fillRect(dim.x,dim.y,dim.width,dim.height);
-                ctx.closePath();
-                ctx.fill();
-            }
-            function remove_indice(last_array,delete_indice){
-                let new_array=[(last_array.lenght-1==-1)?0:last_array.lenght-1];
-                let i_new_array=0;//Indice del nuevo array.
-                for (let i in last_array){
-                    if ( i==delete_indice ){
-                        continue;
-                    }
-                    new_array[i_new_array]=last_array[i];
-                    i_new_array++;
-                }
-                return new_array;
+            Apple.create_manzana=function(){
+                let i=manzana.length,
+                    type=(Apple.is_bonus)?APPLE_NORMAL:parseInt(Math.random()*APPLE_MAX_TYPE);//Si estamos en tiempo de bonos entonces creamos manzanas como locos, pero estas manzanas solo searn normales.
+                manzana[i]=new Apple(
+                            new Dim(
+                                Math.floor(Math.random()*MAX_WIDTH_CANVAS),
+                                Math.floor(Math.random()*MAX_HEIGHT_CANVAS),
+                                10,
+                                10),
+                            type,
+                            Apple.get_color[type]
+                        );
+                Apple.draw(manzana[i],ctx);
             }
             
             function return_for_previous(id_padre_this,id_now,id_previous){
@@ -318,7 +343,7 @@
                 if (IS_GAME_OVER){
                     this_.style.display="flex";
                     clearInterval(interval_game);
-                    clearInterval(interval_manzana);
+                    clearInterval(Apple.interval);
                     //Limpiamos el canvas.
                     ctx.clearRect(0,0,MAX_WIDTH_CANVAS,MAX_HEIGHT_CANVAS);
                     //Vaciamos la memoria.
@@ -330,12 +355,71 @@
                     ///@todo Ver si se puede aumentar el tamaño de la serpiente y no te olvides de aalterar la velocidad en la funcion game.
                     snake=new Snake(new Dim(MAX_WIDTH_CANVAS>>1,MAX_HEIGHT_CANVAS>>1,10,10,3,RIGHT),"green");//El jugador actual.
                     //Creamos la primera manzana.
-                    create_manzana();//Iniciamos la funcion que crea manzanas.
-                    interval_manzana=setInterval(create_manzana,time_create_apple);
+                    Apple.create_manzana();//Iniciamos la funcion que crea manzanas.
+                    Apple.create_interval();
                     //Ponemos a la serpiente al la mita de la pantalla.
                     interval_game=setInterval(game,time_game);//Iniciamos el juego.
                 }
                 
+            }
+            Apple.reset_time_apple=function (){
+                if(is_game_over && is_pause){//Si terminamos el juego o estamos en pausa, entonces desasemos esta funcion.
+                    return;
+                }
+                Apple.is_bonus=false;
+                clearInterval(Apple.interval);
+                Apple.create_interval();
+            }
+            /***Apple.power: Es una funcion estatica usada para determinar el poder de la manzana y tratar su efectos.
+                    @param type: Tipo de manzana.
+                    @return {undefined}
+            */
+            Apple.power=function(apple){
+                let msg="yumin",
+                    dim_snake=snake.dims[snake.dims.length-1];
+                switch (apple.type){
+                    case APPLE_NORMAL:
+                        snake.score+=100;
+                        snake.create(10);
+                        break;
+                    case APPLE_DEATH://Quita puntos, vidas y una cola del jugador: Debe ser de color negro.
+                        snake.score+=500;
+                        if (!snake.is_ghost && snake.dims.length>1){//Si hay cola por destruir entonces la destruimos. //Si la serpiente esta en modo fanstasma entonces no perderá vida.
+                            snake.life--;
+                            ctx.clearRect(dim_snake.x,dim_snake.y,dim_snake.width,dim_snake.height);//Borramos la cola eliminada de la pantalla.
+                            snake.dims=remove_indice(snake.dims,snake.dims.length-1);//Recorto la cola de la serpiente.
+                        }else if(!snake.is_ghost){//Si no , le quitamos dos vidas a la serpiente.
+                            snake.life-=2;
+                        }
+                        msg="OUCH!!!!!!";
+                        break;
+                    case APPLE_GHOST://Hacemos que la serpiente pueda tocarse su propia cola y atravesar las paredes duarante un tiempo determinado.
+                        snake.is_ghost=true;
+                        setTimeout(function(){snake.is_ghost=false;},TIME_GHOST);
+                        msg="Me siento invencible.";
+                        break;
+                    case APPLE_ROCK://Hace que pierda una vida.
+                        if (!snake.is_ghost)
+                            snake.life--;
+                        snake.score+=150;
+                        msg="Auch";
+                        break;
+                    case APPLE_PINK_HEART:
+                        snake.life++;
+                        msg="Me siento con mas fuersas.:)";
+                        break;
+                    case APPLE_BONUS://Hace que el interval_gameo de tiempo de la creacion de la manzana se redusca considarablemente.
+                        Apple.is_bonus=true;
+                        clearInterval(Apple.interval);
+                        Apple.create_interval();
+                        setTimeout(Apple.reset_time_apple,MAX_TIME_BONUS);
+                        msg="Creo que se acerca un buen banquete.:)-";
+                        break;
+                    default:
+                        console.warn("Advertencia: Se paso type="+type+", pero los poderes que estan definidos estan en un rango de 0-"+Apple.MAX_TYPE_APPLE+", por lo que su poder no tendrá nigun efecto en el juego.");
+                }
+                alert(msg)///@todo Cambiar esta alerta por un dibujo de una serpiente diciendo esto comiendo una manzana.
+                return (snake.life<1)?true:false;
             }
         </script>
     </body>
