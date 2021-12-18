@@ -25,7 +25,7 @@
 
 ## ¿Dónde me puedes contactar?
 <p>
-  Aquí dejo mi dirección de correo electrónico: <a href="mailito:dabl03@outlook.com">Dabl03.</a>
+  Aquí dejo mi dirección de correo electrónico: <a href="mailto:dabl03@outlook.com">Dabl03.</a>
 </p>
 
 ## ¿Quien mantiene el proyecto?
