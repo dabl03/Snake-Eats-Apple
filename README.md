@@ -6,7 +6,7 @@
   <pre><codes>git clone https://github.com/dabl03/Snake-Eats-Apple</codes></pre>
   Si no tiene git no te preocupes, puedes descargar el archivo Zip desde esta página y comprimirlo y ejecuta el archivo index.html con un navegador web para comenzar con el juego.
 </p>
-
+ 
 ## ¿Requisitos?
 <p>
   Un navegador que soporte html5;)

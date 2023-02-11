@@ -7,7 +7,7 @@ APPLE_ROCK = 3,
 APPLE_PINK_HEART = 4,
 APPLE_BONUS = 5,
 APPLE_MAX_TYPE = 6; /*Es para poner un limite al random type apple. Nota: Se debe actualizar cada  vez que se agregue una manzana.*/
-
+ 
 function remove_indice(last_array, delete_indice) {
     let new_array = [];
     let i_new_array = 0; //Indice del Nuevo array.
