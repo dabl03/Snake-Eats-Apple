@@ -1,16 +1,15 @@
-
 # Snake-Eats-Apple
 
 ## ¿Cómo ejecutar el juego?
 <p>
-  Simple solo descargue este repositorio con comandos git y ejecuta el archivo index.html con un navegador web (Todavía no le he agregado soporte a Firefox, a parecer hay que crear un servidor y servir esta página para que ese navegador carge los recursos, tiene sentido en el área de la ciberseguridad, pero algo fastidioso cuando quieres probar una página web):
+  Simple solo descargue este repositorio con comandos git y ejecuta el archivo index.html con un navegador web (Todavía no le he agregado soporte a Firefox, a parecer hay que crear un servidor y servir esta página para que ese navegador cargue los recursos, tiene sentido en el área de la ciberseguridad, pero algo fastidioso cuando quieres probar una página web):
   <pre><codes>git clone https://github.com/dabl03/Snake-Eats-Apple</codes></pre>
   Si no tiene git no te preocupes, puedes descargar el archivo Zip desde esta página y comprimirlo y ejecuta el archivo index.html con un navegador web para comenzar con el juego.
 </p>
 
 ## ¿Requisitos?
 <p>
-  Un navegador que soporte html5.;)
+  Un navegador que soporte html5;)
 </p>
 
 ## ¿Cómo puedo ejecutarlo para mi página de servicios de videos-juegos?

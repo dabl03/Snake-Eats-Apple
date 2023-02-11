@@ -8,16 +8,26 @@
     --max-height:97vh;
 }
 body{
-    background-color:#00f;
+	background: rgb(4,16,38);
+	background: linear-gradient(180deg, rgba(4,16,38,1) 0%, rgba(7,2,33,1) 75%, rgba(255,255,255,1) 100%);
+	max-height:100%;
+	max-width:100%;
+	overflow: hidden;
 }
 #game-container{
     --MAX-WIDTH-CANVAS:0;
     --MAX-HEIGHT-CANVAS:0;
-    display:none;
+	margin: 0 0 1rem;
+	height: 10rem;
+	display: none;
+	align-items: start;
+	text-align: center;
+	justify-content: center;
 }
 #game{
     background-color:#2693ff;
     position:absolute;
+	
 }
 .tapar-game{
     display:none;
@@ -39,7 +49,8 @@ body{
     background-image:url("./img/game-over.png");
 }
 #init{
-    background-color:#00f;
+	background: rgb(4,16,38);
+	background: linear-gradient(180deg, rgba(4,16,38,1) 0%, rgba(7,2,33,1) 75%, rgba(255,255,255,1) 100%);
     width:var(--max-width,98vw);
     height:var(--max-height,97vw);
 }
@@ -79,6 +90,7 @@ body{
 }
 #help{
     display:none;
+	color:white;
 }
 #return-to-init{
     display:none;
