@@ -55,7 +55,7 @@ body{
     height:var(--max-height,97vw);
 }
 #init #logo{
-    background-image:#2693ff;
+    background-color:#2693ff;
     width:var(--max-width,98vw);
     height:40vh;
     border:2px solid black;
