@@ -61,7 +61,7 @@ Dim.new_apple = function (dim) {
     return this;
 }
 class Snake {
-    constructor(dim, color, score = 0, life = 3) {
+    constructor(dim, color,ctx, score = 0, life = 3) {
         this.dims = [Dim.new_dim(dim)];
         this.now_address = dim.address;
 		this.radio=Math.sqrt(dim.width*dim.width + dim.height*dim.height)/2;
@@ -70,21 +70,35 @@ class Snake {
         this.is_ghost = false;
         this.color_ghost = "white";
         this.life = life;
+        this.ctx=ctx;
     }
     /**
      * draw: Dibujara todas las colas de la serpiente.
-     * @param: {ctx}: Contexto 2d del canvas.
      * @return {undefined}.
      */
-    draw(ctx) {
-        let fill = ctx.fillStyle;
+    draw() {
+        let fill = this.ctx.fillStyle;
+        let ctx=this.ctx;
         ctx.beginPath();
         ctx.fillStyle = (this.is_ghost) ? this.color_ghost : this.color;
+        ctx.strokeStyle="black";
         ctx.fillRect(
             this.dims[0].x, this.dims[0].y,
             this.dims[0].width, this.dims[0].height
 		);
+        ctx.rect(
+            this.dims[0].x, this.dims[0].y,
+            this.dims[0].width, this.dims[0].height
+        );
         ctx.fill();
+        ctx.stroke();
+        ctx.strokeStyle="gray";
+        for (let i=1;i<this.dims.length;i++){
+            ctx.fillRect(this.dims[i].x,this.dims[i].y,this.dims[0].width,this.dims[0].height);
+            ctx.rect(this.dims[i].x,this.dims[i].y,this.dims[0].width,this.dims[0].height);
+        }
+        ctx.fill();
+        ctx.stroke();
 		ctx.closePath();
         ctx.fillStyle = fill;
     }
@@ -92,10 +106,9 @@ class Snake {
     /**
      * updated: Actualiza la posición actual de la cola.
      * @param {speed}: es la velocidad que la cola se moverá.
-     * @param {ctx}: Contexto 2d del canvas actual.
      * @return {undefined.}
      **/
-    updated(speed, is_ghost, ctx) {
+    updated(speed, is_ghost) {
         let dir_now = this.dims[0].address;
         for (let i in this.dims) {
             let last = this.dims[i].address; //Ultimo address
@@ -117,7 +130,7 @@ class Snake {
     /**
      * prototipe_updated: Es un prototipo del la función actualizar.
      */
-    prototipe_updated(speed, is_ghost, ctx) {
+    prototipe_updated(speed, is_ghost) {
         let primer = this.dims[0]; //Recuerda la serpientes no deben morder su cola por lo que debes usar esto con un if para saber si la cola se mordió a sí misma.
         let the_last_dim = Dim.new_dim(primer); //Para actualizar la posición de la cola siguiente.
 
@@ -138,12 +151,11 @@ class Snake {
     }
     /**
      * clear_all: Limpiamos todas las colas pasadas de este canvas.
-     * @param {ctx}: El contexto 2d del lienzo canvas actual.
      * @return {undefined}
      */
-    clear_all(ctx) {
-        for (let dim of this.dims) {
-            ctx.clearRect(dim.x, dim.y, dim.width, dim.height);
+    clear_all() {
+        for (let i=0;i<this.dims.length;i++) {
+            this.ctx.clearRect(this.dims[i].x,this.dims[i].y,this.dims[0].width,this.dims[0].height);
         }
     }
     /**
@@ -224,25 +236,21 @@ class Apple {
         this.color = color;
     }
 }
-Apple.draw = function (apple, ctx) {
-    let fillStyle = ctx.fillStyle; //Para restaurar el estilo anterior del ctx.
-    ctx.beginPath()
-    //ctx.fillRect(apple.dim.x,apple.dim.y,apple.dim.width,apple.dim.height);
-    ctx.arc(
-        apple.dim.x,
-        apple.dim.y,
-        apple.dim.radio, 0,
-        Math.PI * 2,
-        true);
-    ctx.fillStyle = apple.color;
-    ctx.fill();
-    ctx.closePath();
-    ctx.fillStyle = fillStyle;
-};
-Apple.delete_ = function (apple_dim, ctx) {
-    let x = apple_dim.x - apple_dim.radio,
-    y = apple_dim.y - apple_dim.radio;
-    ctx.clearRect(x, y, apple_dim.width, apple_dim.height);
+Apple.draw = function (apples, ctx) {
+    for(let x=0;x<apples.length;x++){
+        let apple=apples[x];
+        ctx.beginPath()
+        ctx.fillStyle = apple.color;
+        ctx.arc(
+            apple.dim.x,
+            apple.dim.y,
+            apple.dim.radio, 0,
+            Math.PI * 2,
+            true
+        );
+        ctx.fill();
+        ctx.closePath();
+    }
 };
 
 Apple.choque = function (apple, snake) {
@@ -265,3 +273,10 @@ Apple.choque = function (apple, snake) {
     (snake.y>y-(apple.height) && snake.y<y+apple.height)
     );*/
 }
+/*Ya no en uso - Porque se limpia completamente el canvas.
+Apple.delete_ = function (apple_dim, ctx) {
+    let x = apple_dim.x - apple_dim.radio,
+    y = apple_dim.y - apple_dim.radio;
+    ctx.clearRect(x, y, apple_dim.width, apple_dim.height);
+};
+*/

@@ -275,7 +275,7 @@
                 this_.style.display = "none";
                 //Iniciamos otra vez el juego.
                 ///@todo Ver si se puede aumentar el tamaño de la serpiente y no te olvides de alterar la velocidad en la funcion game.
-                snake = new Snake(new Dim(MAX_WIDTH_CANVAS >> 1, MAX_HEIGHT_CANVAS >> 1, 10, 10, 3, RIGHT), "green"); //El jugador actual.
+                snake = new Snake(new Dim(MAX_WIDTH_CANVAS >> 1, MAX_HEIGHT_CANVAS >> 1, 10, 10, 3, RIGHT), "green",ctx); //El jugador actual.
                 //Creamos la primera manzana.
                 Apple.create_manzana(); //Iniciamos la función que crea manzanas.
                 Apple.interval = setInterval(Apple.create_manzana, time_create_apple);
@@ -339,9 +339,7 @@
                             end_game();
                             return; //Terminamos el juego.
                         }
-                        Apple.delete_(manzana[position_c][i].dim, ctx); //Borramos la manzanas del lienzo.
-                        clearInterval(Apple.interval); //Para evitar índices nulo reiniciamos la creación de manzanas.
-
+                        alert(true);
                         manzana[position_c] = remove_indice(manzana[position_c], i);
                         break;
                     }
@@ -355,13 +353,15 @@
             }
             function draw() {
                 snake.draw(ctx); //Dibujamos a nuestra serpiente.
+                Apple.draw(manzana[0],ctx);
+                Apple.draw(manzana[1],ctx);
+                Apple.draw(manzana[2],ctx);
+                Apple.draw(manzana[3],ctx);
             }
             function game() {
                 //Actualizamos la serpiente.
                 if (!is_pause) {
-                    let i = snake.dims.length - 1;
-                    i = (i == -1) ? 0 : i;
-                    ctx.clearRect(snake.dims[i].x, snake.dims[i].y, snake.dims[i].width+1, snake.dims[i].height+1); //Borramos el ultimo elemento.
+                    ctx.clearRect(0,0,MAX_WIDTH_CANVAS,MAX_HEIGHT_CANVAS);
                     if (analice()) {
                         return;
                     } else if (move()) {
@@ -391,10 +391,12 @@
                             x,
                             y,
                             14,
-                            14),
+                            14
+                        ),
                         type,
-                        Apple.get_color[type]));
-                Apple.draw(manzana[index][manzana[index].length - 1], ctx);
+                        Apple.get_color[type]
+                    )
+                );
             }
             /***Apple.power: Es una función estática usada para determinar el poder de la manzana y tratar sus efectos.
             @param type: Tipo de manzana.
@@ -412,7 +414,6 @@
                     snake.score += 500;
                     if (!snake.is_ghost && snake.dims.length > 1) { //Si hay cola por destruir entonces la destruimos. //Si la serpiente esta en modo fantasma entonces no perderá vida.
                         snake.life--;
-                        ctx.clearRect(dim_snake.x, dim_snake.y, dim_snake.width, dim_snake.height); //Borramos la cola eliminada de la pantalla.
                         snake.dims = remove_indice(snake.dims, snake.dims.length - 1); //Recorto la cola de la serpiente.
                     } else if (!snake.is_ghost) { //Si no , le quitamos dos vidas a la serpiente.
                         snake.life -= 2;
