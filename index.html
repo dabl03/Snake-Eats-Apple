@@ -320,9 +320,10 @@
                 let position_c = get_index_apple(snake.dims[0].x, snake.dims[0].y);
                 for (let i = 0; i < manzana[position_c].length; i++) {
                     //Eliminamos la manzana y subimos de nivel a la serpiente.
-                    let x = manzana[position_c][i].x - manzana[position_c][i].radio,
-                    y = manzana[position_c][i].y - manzana[position_c][i].radio,
-                    width = height = manzana[position_c][i].radio * 2,
+                    let m= manzana[position_c][i].dim,
+                    x = m.x - m.radio,
+                    y = m.y -m.radio,
+                    width = height = m.radio * 2,
                     s=snake.dims[0];
                     ctx.beginPath();
                     ctx.strokeStyle="black";
