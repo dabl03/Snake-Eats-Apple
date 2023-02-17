@@ -5,8 +5,6 @@
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" type="text/css" href="./Snake.css"/>
-        <style>
-        </style>
     </head> 
     <body>
 	<!--
@@ -322,6 +320,18 @@
                 let position_c = get_index_apple(snake.dims[0].x, snake.dims[0].y);
                 for (let i = 0; i < manzana[position_c].length; i++) {
                     //Eliminamos la manzana y subimos de nivel a la serpiente.
+                    let x = manzana[position_c][i].x - manzana[position_c][i].radio,
+                    y = manzana[position_c][i].y - manzana[position_c][i].radio,
+                    width = height = manzana[position_c][i].radio * 2,
+                    s=snake.dims[0];
+                    ctx.beginPath();
+                    ctx.strokeStyle="black";
+                    ctx.rect(x,y,width,height);
+                    ctx.stroke();
+                    ctx.strokeStyle="red";
+                    ctx.rect(s.x,s.y,s.width,s.height);
+                    ctx.stroke();
+                    ctx.closePath();
                     if (Apple.choque(manzana[position_c][i].dim, snake.dims[0])) {
                         if (Apple.power(manzana[position_c][i], snake, ctx)) { //Creamos el efecto de la manzana actual.
                             //Ya el jugador ha perdido todas sus vidas.
