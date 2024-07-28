@@ -77,6 +77,7 @@
         </dl>
       </section>
     </div>
+    <img id="img-game-over" src="img/game-over.png" style="visibility: hidden;position: fixed;width:400px;" alt="Perdio el juego"/>
     <script src="./js/Dim.js"></script>
     <script src="./js/Apple.js"></script>
     <script src="./js/Tail.js"></script>
@@ -120,7 +121,6 @@
         
         time_game=100,/*Tiempo de retraso en que se moverá la serpiente.*/
         time_create_apple=3500,/*Tiempo de retraso para que se cree la manzanas. Nota: Esta variable se cambiará si la serpiente come una manzana bonus.*/
-        time_bonus=time_create_apple/3,
         mouse_move=false
       ;
       /*Funciones y variables Apple personalizadas:*/
@@ -188,7 +188,7 @@
         document.getElementById(id_for_return).style.display = "block";
         function_for_return = function () { //Personalizamos para detener los intervalos del juego.
           //Si el usuario no quiere terminar el juego le damos una advertencia.
-          if (!confirm("¿Seguro que deseas terminar el Juego, pueden perderse datos?.")) {
+          if (!confirm("¿Seguro que deseas terminar el Juego, se puede perder datos?.")) {
             return false;
           }
           function_for_return = GET_TRUE;// Se salió
@@ -215,7 +215,7 @@
           case PAUSE: //Key p is pause
             pause();
             break;
-          default: /***@todo; cuando tengas toda esta función lista, quitar este default.*/
+          default:
             if (is_game_over)
               break;
             if (e.keyCode == ENTER)
@@ -272,17 +272,26 @@
         is_game_over = false;
       }
       function end_game() {
-        let this_ = document.getElementById("game-over");
-        this_.style.display = "flex";
+        let this_ = document.getElementById("img-game-over");
+        let mensaje="Game Over";
+        let size=75;
         clearInterval(interval_game);
         clearInterval(Apple.interval);
         //Limpiamos el canvas.
+        ctx.beginPath();
         ctx.clearRect(0, 0, MAX_WIDTH_CANVAS, MAX_HEIGHT_CANVAS);
+        ctx.drawImage(this_,0,0,MAX_WIDTH_CANVAS,MAX_HEIGHT_CANVAS);
+        ctx.font = size+"px Console";
+        ctx.fillStyle="yellow";
+        ctx.strokeStyle="black";
+        ctx.fillText(mensaje,(MAX_WIDTH_CANVAS/2)-((size/2)*(mensaje.length/2)),(MAX_HEIGHT_CANVAS/2)-(size/2));
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
         //Vaciamos la memoria.
-        snake = 0;
+        snake.tails=null;
         apple=null;
         is_game_over = true;
-        Apple.bonus = 0;
       }
     </script>
   </body>
