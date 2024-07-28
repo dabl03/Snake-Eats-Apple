@@ -101,10 +101,6 @@
         
         HALF_WIDTH_CANVAS=MAX_WIDTH_CANVAS/2,
         HALF_HEIGHT_CANVAS=MAX_HEIGHT_CANVAS/2,
-        /*Times:*/
-        TIME_GHOST=20000,// El tiempo que dura la serpiente fantasma
-        TIME_BONUS=100,// El tiempo que dura las manzana en el modo bono.
-        MAX_TIME_BONUS=8000,// El maximo tiempo que dura el bono.
         /*Funciones:*/
         GET_TRUE=()=>true
       ;
@@ -122,7 +118,7 @@
         is_pause=false,/*Si el juego está en pausa esta variable se encargará que nada se ejecute.*/
         is_game_over=false,/*Si el juego termino o no.*/
         
-        time_game=200,/*Tiempo de retraso en que se moverá la serpiente.*/
+        time_game=100,/*Tiempo de retraso en que se moverá la serpiente.*/
         time_create_apple=3500,/*Tiempo de retraso para que se cree la manzanas. Nota: Esta variable se cambiará si la serpiente come una manzana bonus.*/
         time_bonus=time_create_apple/3,
         mouse_move=false
