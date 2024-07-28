@@ -1,15 +1,16 @@
 :root{
-    --color-botton-menu-inicial:#ffea00;
-    --color-botton-menu-inicial-hover:#ff6;
-    --border-color-botton-menu-inicial:#000;
+    --color-fondo:#69ac70;
+    --color-botton-menu-inicial:#ffa700;
+    --color-botton-menu-inicial-hover:#ff9866;
+    --game-color:#b5ffb3;;
+    --border-color-botton-menu-inicial:#f00;
     --border-color-botton-menu-inicial-hover:#aaa;
     --color-transparent:rgba(0,0,0,0);
     --max-width:98vw;
     --max-height:97vh;
 }
 body{ 
-	background: rgb(4,16,38);
-	background: linear-gradient(180deg, rgba(4,16,38,1) 0%, rgba(7,2,33,1) 75%, rgba(255,255,255,1) 100%);
+	background-color: var(--color-fondo,red);
 	max-height:100%;
 	max-width:100%;
 	overflow: hidden;
@@ -25,14 +26,13 @@ body{
 	justify-content: center;
 }
 #game{
-    background-color:#2693ff;
+    background-color:var(--game-color,#000);
     position:absolute;
 	
 }
 .tapar-game{
     display:none;
-    position:absolute;/*Recuerda game y tapar-game deben estar en position absolute para que esten en el mismo lado.*/
-    background-color:rgba(0,0,0,0.6);
+    position:absolute;
     z-index:1;
     justify-content:center;
     align-content:center;
@@ -49,13 +49,10 @@ body{
     background-image:url("./img/game-over.png");
 }
 #init{
-	background: rgb(4,16,38);
-	background: linear-gradient(180deg, rgba(4,16,38,1) 0%, rgba(7,2,33,1) 75%, rgba(255,255,255,1) 100%);
     width:var(--max-width,98vw);
     height:var(--max-height,97vw);
 }
 #init #logo{
-    background-color:#2693ff;
     width:var(--max-width,98vw);
     height:40vh;
     border:2px solid black;
@@ -94,7 +91,7 @@ body{
 }
 #return-to-init{
     display:none;
-    background-image:linear-gradient(to bottom,#000 40%,#3b3b3b,#777,#b9b9b9,#fff);
+    background-image:linear-gradient(to bottom,#000 40%,#3b3b3b,#777,#b9b9b9);
     color:white;
 }
 #return-to-init-button{

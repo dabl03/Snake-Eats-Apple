@@ -11,12 +11,12 @@ const APPLE_NORMAL = 0,
 const APPLE_TYPE=[
   // Recuerda que debe tener el mismo orden.
   // No deben tener las misma probabilidades (odds)
-  {"name":"Nueva vida", "odds":10, "color":"#f9a","id":APPLE_HEART},
-  {"name":"Inicio del bonus", "odds":15, "color":"#f96","id":APPLE_BONUS},
-  {"name":"Fuerza epiritual", "odds":20, "color":"#ffe6ea",APPLE_GHOST},
+  {"name":"Nueva vida", "odds":5, "color":"#f9a","id":APPLE_HEART},
+  {"name":"Inicio del bonus", "odds":10, "color":"#f96","id":APPLE_BONUS},
+  {"name":"Fuerza epiritual", "odds":25, "color":"#efefff","id":APPLE_GHOST},
   {"name":"Fortaleza de la roca","odds":30, "color":"#844","id":APPLE_ROCK},
   {"name":"Muerte", "odds":40, "color":"#4f0000","id":APPLE_DEATH},
-  {"name":"Normal", "odds":100, "color":"#f77","id":APPLE_NORMAL}
+  {"name":"Normal", "odds":100, "color":"#f00","id":APPLE_NORMAL}
 ];
 const APPLE_COLORS=APPLE_TYPE.map((item)=>item["color"]);
 

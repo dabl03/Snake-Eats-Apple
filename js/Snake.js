@@ -1,11 +1,18 @@
 class Snake extends Dim{
-  static GHOST_COLOR="#ffefef";
-  static ROCK_COLOR = "#a88";
-  static NORMAL_COLOR="#a0f"; //Ver si usar el "green"
   //Power
   static NORMAL=0;
   static GHOST=1;
   static ROCK=2;
+
+  static POWER={
+    //Color de efecto, Puntos ganados, duración, vida dada, crear cola, mensaje.
+    [APPLE_NORMAL]:["#d97799", 100, 0xFFFFF, 0, 1, "Yummyng"], // NORMAL
+    [APPLE_GHOST]:["#efefff", 200, 20, 0, 0, "Soy invencible"], // GHOST
+    [APPLE_ROCK]:["#988", 200, 20, 0, 0,  "Soy roca"], // ROCK
+    [APPLE_DEATH]:["#005", 500, 10, -1, -1, "Eso dolio"], // DEATH
+    [APPLE_HEART]:["#f9a", -100, 10, 1, 1, "Estoy mas fuerte"], // LIFE
+    [APPLE_BONUS]:["#f96", 50, 50, 0, 0, "Tiempo de banquete"] // Bonus
+  };
   //address
   static TOP = 0;
   static BOTTOM = 1;
@@ -26,8 +33,9 @@ class Snake extends Dim{
     this.score = score;
     this.life = life;
     this.address=address;
-    this.power = Snake.NORMAL;
-    this.color = Snake.NORMAL_COLOR;
+    this.power = APPLE_NORMAL;
+    this.color= Snake.POWER[APPLE_NORMAL];
+    this.time=0;
     this.tails = null;
   }
   /**Dibuja la serpiente y las colas
@@ -37,17 +45,12 @@ class Snake extends Dim{
   draw(ctx) {
     let fill = ctx.fillStyle;
     ctx.beginPath();
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = Snake.POWER[this.power][0];
     ctx.strokeStyle = "black";
     ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.stroke();
-    //Dibujamos las colas.
-    ctx.strokeStyle = "gray";
-    for (let tail = this.tails; tail!=null; tail=tail.next_tail) {
+    for (let tail = this.tails; tail!=null; tail=tail.next_tail)
       ctx.fillRect(tail.x, tail.y, tail.width, tail.height);
-      ctx.rect(tail.x, tail.y, tail.width, tail.height);
-    }
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
@@ -56,12 +59,12 @@ class Snake extends Dim{
 
   /**Actualiza la posición actual de la cola y la cabeza.
    * 
-   * @param {speed}: es la velocidad que la cola se moverá.
-   * @return Tail
+   * @param {int} speed es la velocidad que la cola se moverá.
+   * @return Tail Si choco con la cola, de lo contrario null
    **/
-  updated(speed) {
+  move_all(speed) {
     if (!this.tails){// Si no hay cola
-      this.move(speed);
+      this.move_head(speed);
       return null;
     }
     var aft_x=this.tails.x,
@@ -80,14 +83,14 @@ class Snake extends Dim{
         return tail;
       }
     }
-    this.move(speed);
+    this.move_head(speed);
     return null;
   }
   /**Mueve la cabeza a la siguiente posición.
    * 
    * @param {int} speed Velocidad a mover.
    */
-  move(speed){
+  move_head(speed){
     switch (this.address) {
       case Snake.TOP:
         this.y -= speed;
@@ -114,18 +117,40 @@ class Snake extends Dim{
   /**
    * Creamos una nueva cola.
    * @param {int} speed Distancia a mover la cabeza.
-   * @param {int} score Puntuación obtenida
-   */
-  create(speed,score=0) {
-    this.score+=score;
-    if (this.tails==null){// Primera cola
-      this.tails=new Tail(this.x, this.y, this.width, this.height,null);
-      this.updated(speed);
-      return;
-    }
-    //                         Dim,    this tail
-    var tail=Tail.new_tail(this.tails, this.tails);
-    this.updated(speed);// Movemos la cola para que el Eslabón anterior esté mas adelante y el actual quede atrás
+  */
+  create(speed) {
+    //Tail.new_tail(Dim,    this tail)
+    var tail=Tail.new_tail(
+      (this.tails==null)? this: this.tails,
+      this.tails
+    );
+    this.move_all(speed);// Movemos la cola para que el Eslabón anterior esté mas adelante y el actual quede atrás
     this.tails=tail;
+  }
+  /**Quita una cola. Retorna true si no se pudo quitar cola (gameover) */
+  delete(){
+    if (this.tails!=null)
+      this.tails=this.tails.next_tail;
+    else
+      return true;
+    return false;
+  }
+  /**Activa el efecto de la manzana pasada.
+   * 
+   * @param {int} typ_apple El tipo de manzana.
+   * @param {int} speed Velocidad que la serpiente se mueve. 
+   * @returns 
+   */
+  run_power(typ_apple, speed){
+    var apple=Snake.POWER[typ_apple];
+    this.power=typ_apple;
+    this.score+=apple[1];
+    this.time=apple[2];
+    this.life+=apple[3];
+    if (apple[4]>0)
+      this.create(speed);
+    else if (apple[4]<0 && this.power!=APPLE_GHOST && this.power!=APPLE_ROCK)
+      return this.delete();
+    return false;
   }
 };
