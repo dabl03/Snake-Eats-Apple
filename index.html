@@ -1,456 +1,293 @@
 <!doctype html>
 <html lang="es">
-    <head>
-        <title>Snake.</title>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" type="text/css" href="./Snake.css"/>
-    </head> 
-    <body>
-	<!--
-		#~@todo: Arreglar como se posiciona los círculos.
-	-->
-        <div id="init">
-            <!--La presentación del juego.-->
-            <div id="logo">
-                <img src="./img/logo-cerpiente-come-manzana.png" alt="serpiente-logo."/>
-                <h1>Serpiente Come Manzana.</h1>
-            </div>	
-            <div id="menu-inicial">
-                <button type="button" id="init-game-button" class="menu-inicia-button" onclick="init_game_button('return-to-init');">Jugar</button>
-                <br/>
-                <button type="button" id="help-button" class="menu-inicia-button" onclick="help('init','return-to-init');">Ayuda.</button>
-                <br/>
-                <button type="button" id="opciones-button" class="menu-inicia-button">Opcion.</button>
-                <br/>
-                <button type="button" id="save-game-in-the-clout-button" class="menu-inicia-button">Guardar en la nube.</button>
-                <br/>
-            </div>
-        </div>
-        <div id="return-to-init">
-            <button type="button" id="return-to-init-button" onclick="return_for_previous('return-to-init',id_now,id_previous);">&lt;&lt; </button>
-            <span id="center">Regresar.</span>
-            <hr/>
-            <hr/>
-        </div>
-        <div id="game-container">
-            <!--Todo el juego voy a dibujarlo en el canvas con JavaScript.-->
-            <canvas id="game">You Navigator is obsolete.:)</canvas>
-            <div id="msg-pause-game" onclick="pause(this);" class="tapar-game">
-                <span>Vuelva a presionar P para reanudar el juego o haga click aquí.</span>
-            </div>
-            <div id="game-over" class="tapar-game" onclick="start_game();">
-                <h2>GAME-OVER.</h2>
-            </div>
-            <div id="controles-game">
-                
-            </div>
-        </div>
-        <div id="help">
-            <section>
-                <h1 align="center">Help</h1>
-                <hr/>
-                <div>
-                    <h2>¿Cómo se juega?</h2>
-                    <p>
-                        Se juega moviendo la serpiente a donde están las manzanas para comérselas, el objetivo es comer tantas manzanas como puedas y nunca chocar con un obstáculo o contra tu propia cola.
-                    </p>
-                    <dl>
-                        <dt>
-                            Manzanas y sus habilidades:
-                        </dt>
-                        <dd>
-                            <ul>
-                                <li>Manzanas rojas: Son manzanas normales que están hechas de carnes de ratas, carne de rata humm... Sabocho.</li>
-								<li>Manzanas negras: Están hechas de frutas podridas y veneno. Mata de golpe.</li>
-								<li>Manzanas blancas: Manzana proveniente de las lejanas tierras de Galicia(España) bendecida por Dios, puede darte estómago de hierro y piel de plata. Úsala y eres inmune a las reglas negativas de este juego.</li>
-								<li>Manzanas marronas: Son manzanas podridas. Te quitarán vida</li>
-								<li>Manzanas rosadas: Hecha por las grandes alquimistas de la gran tierra veterinaria. Tiene el efecto de darte más resistencia a la toxicidad de las manzanas podridas, pero no te salva de las venenosas</li>
-								<li>Píldora digo Manzanas anaranjadas: Esta te da aluci... digo crea manzanas de c. rata de la nada. Extrañamente, no te sientes lleno después de comerte todas las manzanas.</li>
-                            </ul>
-                        </dd>
-                    </dl>
-					<dl>
-						<dt>
-							Controles
-						</dt>
-						<dd>
-							Se puede usar tanto mouse como teclado, pero aconsejo usar solo el teclado.
-						</dd>
-					</dl>
-                </div>
-            </section>
-        </div>
-        <script src="./snake.js"></script>
-        <script>
-            //Constants:
-            const 
-                /*Directions:*/
-                    TOP=38,
-                    BOTTOM=40,
-                    LEFT=37,
-                    RIGHT=39,
-                /*Flags:*/
-                    PAUSE=80,
-                    SQUAL=0,
-                    MAYOR=1,
-                    MENOR=-1,
-                    ENTER=13,
-                /*Dimensiones:*/
-                    MAX_WIDTH_CANVAS=screen.availWidth-((screen.availWidth*20)/100),
-                    MAX_HEIGHT_CANVAS=screen.availHeight-((screen.availHeight*35)/100),
-					HALF_WIDTH_CANVAS=MAX_WIDTH_CANVAS/2,//Solo para optimizar el detector de colisiones de cada manzana.
-					HALF_HEIGHT_CANVAS=MAX_HEIGHT_CANVAS/2,
-                /*Times:*/
-                    TIME_GHOST=20000,//El tiempo que la serpiente permanecerá siendo fantasma durante el juego.
-                    TIME_BONUS=100,/*Es para definir el tiempo en que cada manzana se creará las manzanas en tiempo de bono.*/
-                    MAX_TIME_BONUS=8000,/*El tiempo máximo en que durara el bono de las manzanas.*/
-                /*Funciones:*/
-                    FUNCTION_TRUE=function(){return true;}/*Función que siempre devuelve true.;)*/
-            ;
-            //global:
-            var id_previous="init",/*Para saber cuál ha sido la actividad anterior: inicio, pausa, juego, instrucciones, etc... .*/
-                id_now="init",/*Para saber cuál ha sido la actividad siguiente: inicio, pausa, juego, instrucciones, etc... .*/
-                
-                ctx,//Importante: Contexto 2d del canvas y se inicia en window.onload.
-                
-                interval_game,//Variable que contendrá el id del intervalo del juego actual.
-                
-                snake,//serpiente actual.
-                manzana=[//cada uno representa una parte del canvas.
-					//Se llenará con las manzanas en la matriz especifica de acuerdo con la posición
-					//del canvas para optimizar el detector de colisiones
-					[],//Mitad superior izquierda.
-					[],//superior derecha.
-					[],//inferior izquierda.
-					[]//inferior derecha.
-				],
-                function_for_return=FUNCTION_TRUE,//Sera llamada al principio de la funcion return_for_previous, para personaliza, liberar o detener los intervalos planificado para la ejecución del juego.
-                
-                is_pause=false,/*Si el juego está en pausa esta variable se encargará que nada se ejecute.*/
-                is_game_over=false,/*Si el juego termino o no.*/
-                
-                time_game=200,/*Tiempo de retraso en que se moverá la serpiente.*/
-                time_create_apple=3500,/*Tiempo de retraso para que se cree la manzanas. Nota: Esta variable se cambiará si la serpiente come una manzana bonus.*/
-				time_bonus=time_create_apple/3
-            ;
-            /*Funciones y variables Apple personalizadas:*/
-            Apple.bonus=0;//Para saber si estamos en tiempo de bono.
-            Apple.interval=0;//Variable que contendrá el id del intervalo de la creación de la manzanas.
-            Apple.get_color={};//Con esto decidiremos cual color tendrá la manzanas. Nota: No intente iniciarlo en el momento de declararlo, porque en vez de agarrar el valor de las variables constantes agarra el nombre como clave, y lo que queremos es que agarre el valor como clave.
-            //Begin get_color:
-                Apple.get_color[APPLE_NORMAL]="red";
-                Apple.get_color[APPLE_DEATH]="black";
-                Apple.get_color[APPLE_GHOST]="white";
-                Apple.get_color[APPLE_ROCK]="brown";
-                Apple.get_color[APPLE_PINK_HEART]="pink";
-                Apple.get_color[APPLE_BONUS]="orange";
-            //End get_color
-            /*@todo en la parte donde se verifica si la serpiente toco una manzana agregarle los poderes con un switch.*/
-            
-            /****
-                * @todo: Hacer una barra de herramientas en la parte derecha del canvas que simbolice el estado de la serpiente.
-                * @todo: Hacer un dibujo de una serpiente feliz porque caen muchas manzanas rojas y ponerla en el estado cuando este Apple.is_bonus activo.
-                * @todo: Hacer lo mismo con la snake.is_ghost y un dibujo de una serpiente blanca.
-                * @todo: Preparar una buena documentación con todas las funciones y clases de este juego.
-            */
-            
-            ///@todo : Cambiar esta función para albergar a un menú que de la siguientes opciones:
-            ///- Iniciar el juego.
-            ///- Help: Cuadro que indica como jugar el juego.
-            ///- Configure:; Configuraciones. @todo: Pensar cuales.
-            ///- Save: Guardar el puntaje y las configuraciones.
-        </script>
-        <script>
+  <head>
+  <title>Snake.</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="./Snake.css"/>
+  </head> 
+  <body>
+    <!--
+      #~@todo: Arreglar como se posiciona los círculos.
+    -->
+    <div id="init">
+      <!--La presentación del juego.-->
+      <div id="logo">
+        <img src="./img/logo-cerpiente-come-manzana.png" alt="serpiente-logo."/>
+        <h1>Serpiente Come Manzana.</h1>
+      </div>	
+      <div id="menu-inicial">
+        <button type="button" id="init-game-button" class="menu-inicia-button"
+        onclick="init_game_button('return-to-init');">Jugar</button>
+        <br/>
+        <button type="button" id="help-button" class="menu-inicia-button"
+        onclick="help('init','return-to-init');">Ayuda.</button>
+        <br/>
+        <button type="button" id="opciones-button" class="menu-inicia-button">Opcion.</button>
+        <br/>
+        <button type="button" id="save-game-in-the-clout-button"
+        class="menu-inicia-button">Guardar en la nube.</button>
+        <br/>
+      </div>
+    </div>
+    <div id="return-to-init">
+      <button type="button" id="return-to-init-button" 
+      onclick="escene_previous('return-to-init',id_now,id_previous);">&lt;&lt; </button>
+      <span id="center">Regresar.</span>
+      <hr/>
+      <hr/>
+    </div>
+    <div id="game-container">
+      <!--Todo el juego voy a dibujarlo en el canvas con JavaScript.-->
+      <canvas id="game">You Navigator is obsolete.:)</canvas>
+      <div id="msg-pause-game" onclick="pause(this);" class="tapar-game">
+        <span>Vuelva a presionar P para reanudar el juego o haga click aquí.</span>
+      </div>
+      <div id="game-over" class="tapar-game" onclick="start_game();">
+        <h2>GAME-OVER.</h2>
+      </div>
+      <div id="controles-game"></div>
+    </div>
+    <div id="help">
+      <section>
+        <h2 align="center">Help</h1>
+        <hr/>
+        <h2>¿Cómo se juega?</h2>
+        <p>
+          Se juega moviendo la serpiente a donde están las manzanas para comérselas,
+          el objetivo es comer tantas manzanas como puedas y nunca chocar con un obstáculo o 
+          contra tu propia cola.
+        </p>
+        <dl>
+          <dt>Manzanas y sus habilidades:</dt>
+          <dd>
+            <ul>
+              <li>Manzanas rojas: Son manzanas normales que están hechas de carnes de ratas, carne de rata humm... Sabocho.</li>
+              <li>Manzanas negras: Están hechas de frutas podridas y veneno. Mata de golpe.</li>
+              <li>Manzanas blancas: Manzana proveniente de las lejanas tierras de Galicia(España) bendecida por Dios, puede darte estómago de hierro y piel de plata. Úsala y eres inmune a las reglas negativas de este juego.</li>
+              <li>Manzanas marronas: Son manzanas podridas. Te quitarán vida</li>
+              <li>Manzanas rosadas: Hecha por las grandes alquimistas de la gran tierra veterinaria. Tiene el efecto de darte más resistencia a la toxicidad de las manzanas podridas, pero no te salva de las venenosas</li>
+              <li>Píldora digo Manzanas anaranjadas: Esta te da aluci... digo crea manzanas de c. rata de la nada. Extrañamente, no te sientes lleno después de comerte todas las manzanas.</li>
+            </ul>
+          </dd>
+        </dl>
+        <dl>
+          <dt>Controles</dt>
+          <dd>Se puede usar tanto mouse como teclado, pero aconsejo usar solo el teclado.</dd>
+        </dl>
+      </section>
+    </div>
+    <script src="./js/Dim.js"></script>
+    <script src="./js/Apple.js"></script>
+    <script src="./js/Tail.js"></script>
+    <script src="./js/Snake.js"></script>
+    <script>
+      //Constants:
+      const 
+        /*Directions:*/
+        TOP=38,
+        BOTTOM=40,
+        LEFT=37,
+        RIGHT=39,
+        /*Flags:*/
+        PAUSE=80,
+        SQUAL=0,
+        MAYOR=1,
+        MENOR=-1,
+        ENTER=13,
+        /*Dimensiones:*/
+        MAX_WIDTH_CANVAS=screen.availWidth-((screen.availWidth*20)/100),
+        MAX_HEIGHT_CANVAS=screen.availHeight-((screen.availHeight*35)/100),
+        
+        HALF_WIDTH_CANVAS=MAX_WIDTH_CANVAS/2,
+        HALF_HEIGHT_CANVAS=MAX_HEIGHT_CANVAS/2,
+        /*Times:*/
+        TIME_GHOST=20000,// El tiempo que dura la serpiente fantasma
+        TIME_BONUS=100,// El tiempo que dura las manzana en el modo bono.
+        MAX_TIME_BONUS=8000,// El maximo tiempo que dura el bono.
+        /*Funciones:*/
+        GET_TRUE=()=>true
+      ;
+      var id_previous="init",// Escena anterior: inicio, pausa, juego, instrucciones, etc... .
+        id_now="init",/// Escena actual
+      
+        ctx,// Canvas 2d context se inicia en window.onload
+        interval_game,// Intervalo del juego
+        snake,// player.
+        apple=null, // null indica que no hay otro elemento.
+        function_for_return=GET_TRUE,//Sera llamada al principio de la 
+        // funcion return_for_previous, para personaliza, liberar o 
+        // detener los intervalos planificado para la ejecución del juego.
 
-            //FUNCIONES:
-            window.onload = function () {
-                let canvas_container = document.getElementById("game-container");
-                let canvas = document.getElementById("game");
-                let pause_game = document.getElementById("msg-pause-game");
-                let game_over_ELEMENT = document.getElementById("game-over");
-                //ponemos el canvas del tamaño de la pantalla.
-                //Nota quiero ponerlo más pequeño y agregar más detalles a la presentación.
-                canvas.setAttribute("width", MAX_WIDTH_CANVAS);
-                canvas.setAttribute("height", MAX_HEIGHT_CANVAS);
-                //Hacemos que el contenedor de pausa ocupe todo el canvas.
-                canvas_container.style.setProperty("--MAX-WIDTH-CANVAS", MAX_WIDTH_CANVAS + "px")
-                canvas_container.style.setProperty("--MAX-HEIGHT-CANVAS", MAX_HEIGHT_CANVAS + "px")
-                ///@todo Hacer que esta función se use por todos los eventos y darle una adaptación especial a evento touch.
-                canvas.addEventListener("mousemove", function (e) {
-                    let dim = snake.dims[0];
-                    //Creamos un flag que dirá si el mouse esta menor o igual a la posición X y Y de la serpiente.
-                    let is_x = (dim.x == e.clientX) ? SQUAL : (e.clientX > dim.x) ? MAYOR : MENOR; //Mayor significa RIGHT
-                    let is_y = (dim.y == e.clientY) ? SQUAL : (e.clientY > dim.y) ? MAYOR : MENOR; //Mayor significa BOTTOM.
-                    let dis_x = (is_x == MAYOR) ? e.clientX - dim.x : dim.x - e.clientX;
-                    let dis_y = (is_y == MAYOR) ? e.clientY - dim.y : dim.y - e.clientY;
-                    if (dis_x > dis_y) {
-                        dim.address = (is_x == MAYOR) ? RIGHT : LEFT;
-                    } else {
-                        dim.address = (is_y == MAYOR) ? BOTTOM : TOP;
-                    }
-                });
+        is_pause=false,/*Si el juego está en pausa esta variable se encargará que nada se ejecute.*/
+        is_game_over=false,/*Si el juego termino o no.*/
+        
+        time_game=200,/*Tiempo de retraso en que se moverá la serpiente.*/
+        time_create_apple=3500,/*Tiempo de retraso para que se cree la manzanas. Nota: Esta variable se cambiará si la serpiente come una manzana bonus.*/
+        time_bonus=time_create_apple/3,
+        mouse_move=false
+      ;
+      /*Funciones y variables Apple personalizadas:*/
+      Apple.bonus=0;//Para saber si estamos en tiempo de bono.
+      Apple.interval=0;//Variable que contendrá el id del intervalo de la creación de la manzanas.
+      /*@todo en la parte donde se verifica si la serpiente toco una manzana agregarle los poderes con un switch.*/
+  
+      /****
+      * @todo: Hacer una barra de herramientas en la parte derecha del canvas que simbolice el estado de la serpiente.
+      * @todo: Hacer un dibujo de una serpiente feliz porque caen muchas manzanas rojas y ponerla en el estado cuando este Apple.is_bonus activo.
+      * @todo: Hacer lo mismo con la snake.is_ghost y un dibujo de una serpiente blanca.
+      * @todo: Preparar una buena documentación con todas las funciones y clases de este juego.
+      */
+  
+      ///@todo : Cambiar esta función para albergar a un menú que de la siguientes opciones:
+      ///- Iniciar el juego.
+      ///- Help: Cuadro que indica como jugar el juego.
+      ///- Configure:; Configuraciones. @todo: Pensar cuales.
+      ///- Save: Guardar el puntaje y las configuraciones.
+    </script>
+    <script src="./js/game.js"></script>
+    <script>
+      //FUNCIONES:
+      window.onload = function () {
+        let canvas_container = document.getElementById("game-container");
+        let canvas = document.getElementById("game");
+        let pause_game = document.getElementById("msg-pause-game");
+        let game_over_ELEMENT = document.getElementById("game-over");
 
-                ctx = canvas.getContext("2d"); //Obtenemos nuestro contexto 2d.
-            };
-            //Para iniciar el juego:
-            function init_game_button(id_for_return) {
-                //Preparamos la variables que nos permitirá establecer una forma de regresar al la pantalla anterior
-                id_previous = "init";
-                id_now = "game-container";
-                //Desaparecemos y aparecemos los elementos que necesitamos.
-                document.getElementById(id_previous).style.display = "none";
-                //Aparecemos nuestro lienzo para el juego.
-                document.getElementById(id_now).style.display = "flex";
-                //Frecha de retorno.
-                document.getElementById(id_for_return).style.display = "block";
-                function_for_return = function () { //Personalizamos para detener los intervalos del juego.
-                    //Si el usuario no quiere terminar el juego le damos una advertencia.
-                    if (!confirm("¿Seguro que deseas terminar el Juego, pueden perderse datos?.")) {
-                        return false;
-                    }
-                    function_for_return = FUNCTION_TRUE; //Como será llamado cada vez que el usuario regrese a la pantalla principal debemos darle una función vacía.
-                    //Liberamos la memoria innecesaria.
-                    end_game();
-                    return true;
-                }
-                document.body.addEventListener("keydown", function (e) {
-                    /***@todo: hacer que cuando se regrese del juego este evento cambie a otro que controle los botones.*/
-                    e.keyCode = (e.keyCode >= 'A' && e.keyCode <= 'Z') ? (95 - e.keyCode) + 32 : e.keyCode;
-                    switch (e.keyCode) {
-                    case LEFT: //Tecla de la flecha izquierda o key left.
-                        snake.dims[0].address = LEFT;
-                        break;
-                    case RIGHT: //Tecla de la flecha derecha o key right.
-                        snake.dims[0].address = RIGHT;
-                        break;
-                    case TOP: //Tecla de la flecha arriba o key up.
-                        snake.dims[0].address = TOP;
-                        break;
-                    case BOTTOM: //Tecla de la flecha abajo o key bottom.
-                        snake.dims[0].address = BOTTOM;
-                        break;
-                    case PAUSE: //tecla p que la trataremos como Pausa.
-                        pause();
-                        break;
-                    default: /***@todo; cuando tengas toda esta función lista, quitar este default.*/
-                        if (is_game_over)
-                            break;
-                        if (e.keyCode == ENTER) {
-                            pause();
-                        }
-                        return;
-                    }
-                });
-                start_game();
-            }
-            function pause() {
-                document.getElementById("msg-pause-game").style.display = (!is_pause) ? "flex" : "none";
-                is_pause = !is_pause;
-            }
-            function return_for_previous(id_padre_this, id_now, id_previous) {
-                if (!function_for_return()) {
-                    return;
-                }
-                let change = id_previous; //Necesitamos un contenedor para intercambiar las variables.
-                document.getElementById(id_previous).style.display = "block";
-                document.getElementById(id_now).style.display = "none";
-                if (id_previous === "init") { //Si estamos en el inicio, entonces no necesitamos este menú y lo desaparecemos.
-                    document.getElementById(id_padre_this).style.display = "none";
-                }
-                id_previous = id_now;
-                id_now = change;
-            }
-            function help(now, id_menu_return) {
-                let for_hidden = document.getElementById(now);
-                let for_visible = document.getElementById("help");
-                for_visible.style.display = "block";
-                for_hidden.style.display = "none";
-                document.getElementById(id_menu_return).style.display = "block";
-                id_previous = now;
-                id_now = "help";
-            }
-            function start_game() {
-                let this_ = document.getElementById("game-over");
-                this_.style.display = "none";
-                //Iniciamos otra vez el juego.
-                ///@todo Ver si se puede aumentar el tamaño de la serpiente y no te olvides de alterar la velocidad en la funcion game.
-                snake = new Snake(new Dim(MAX_WIDTH_CANVAS >> 1, MAX_HEIGHT_CANVAS >> 1, 10, 10, 3, RIGHT), "green",ctx); //El jugador actual.
-                //Creamos la primera manzana.
-                Apple.create_manzana(); //Iniciamos la función que crea manzanas.
-                Apple.interval = setInterval(Apple.create_manzana, time_create_apple);
-                //Ponemos a la serpiente al la mita de la pantalla.
-                interval_game = setInterval(game, time_game); //Iniciamos el juego.
-                is_game_over = false;
-            }
-            function end_game() {
-                let this_ = document.getElementById("game-over");
-                this_.style.display = "flex";
-                clearInterval(interval_game);
-                clearInterval(Apple.interval);
-                //Limpiamos el canvas.
-                ctx.clearRect(0, 0, MAX_WIDTH_CANVAS, MAX_HEIGHT_CANVAS);
-                //Vaciamos la memoria.
-                snake = 0;
-                for (let i in manzana)
-                    manzana[i] = [];
-                is_game_over = true;
-                Apple.bonus = 0;
-            }
-
-            /*** Función para optimización, de acuerdo a las coordenadas.
-             * Pasadas se ve en que posición del canvas es más probable que este.
-             * Se divide el canvas en cuatros partes iguales y se retorna el id de las partes.
-             * @param position_x - Entero posición x de la canvas..
-             * @param position_y - Entero posición y de la canvas.
-             * @return int - 0 para mitad superior izquierda, 1 superior derecha, 2 inferior izquierda y 3 inferior derecha.*/
-            function get_index_apple(position_x, position_y) {
-                if (position_x > HALF_WIDTH_CANVAS) { //Mitad derecha de la pantalla. seria índice 1 o 3
-                    return (position_y < HALF_HEIGHT_CANVAS) ? 1 : 3;
-                } else { //Mitad izquierda de la pantalla. seria índice 0 o 2
-                    return (position_y < HALF_HEIGHT_CANVAS) ? 0 : 3;
-                }
-            }
-            function analice() {
-                if (!snake.is_ghost & snake.dims[0].x > MAX_WIDTH_CANVAS || snake.dims[0].x < 0 ||
-                    snake.dims[0].y > MAX_HEIGHT_CANVAS || snake.dims[0].y < 0) { //Evitar que se salga del canvas.
-                    end_game();
-                    return true;
-                }
-                let position_c = get_index_apple(snake.dims[0].x, snake.dims[0].y);
-                for (let i = 0; i < manzana[position_c].length; i++) {
-                    //Eliminamos la manzana y subimos de nivel a la serpiente.
-                    let m= manzana[position_c][i].dim,
-                    x = m.x - m.radio,
-                    y = m.y -m.radio,
-                    width = height = m.radio * 2,
-                    s=snake.dims[0];
-                    ctx.beginPath();
-                    ctx.strokeStyle="black";
-                    ctx.rect(x,y,width,height);
-                    ctx.stroke();
-                    ctx.strokeStyle="red";
-                    ctx.rect(s.x,s.y,s.width,s.height);
-                    ctx.stroke();
-                    ctx.closePath();
-                    if (Apple.choque(manzana[position_c][i].dim, snake.dims[0])) {
-                        if (Apple.power(manzana[position_c][i], snake, ctx)) { //Creamos el efecto de la manzana actual.
-                            //Ya el jugador ha perdido todas sus vidas.
-                            end_game();
-                            return; //Terminamos el juego.
-                        }
-                        alert(true);
-                        manzana[position_c] = remove_indice(manzana[position_c], i);
-                        break;
-                    }
-                }
-            }
-            function move() {
-                if (snake.prototipe_updated(10, Apple.is_nake_ghost, ctx)) {
-                    end_game();
-                    return true;
-                }
-            }
-            function draw() {
-                snake.draw(ctx); //Dibujamos a nuestra serpiente.
-                Apple.draw(manzana[0],ctx);
-                Apple.draw(manzana[1],ctx);
-                Apple.draw(manzana[2],ctx);
-                Apple.draw(manzana[3],ctx);
-            }
-            function game() {
-                //Actualizamos la serpiente.
-                if (!is_pause) {
-                    ctx.clearRect(0,0,MAX_WIDTH_CANVAS,MAX_HEIGHT_CANVAS);
-                    if (analice()) {
-                        return;
-                    } else if (move()) {
-                        return;
-                    }
-                    draw();
-                }
-            }
-            Apple.create_manzana = function () {
-                if (is_pause)
-                    return;
-                let type = APPLE_NORMAL;
-                if (Apple.bonus > 0) {
-                    Apple.bonus -= 1;
-                    if (Apple.bonus == 0) {
-                        clearInterval(Apple.interval);
-                        Apple.interval = setInterval(Apple.create_manzana, time_create_apple);
-                    }
-                } else {
-                    type = parseInt(Math.random() * APPLE_MAX_TYPE);
-                }
-                let x = Math.random() * MAX_WIDTH_CANVAS,
-                y = Math.random() * MAX_HEIGHT_CANVAS,
-                index = get_index_apple(x, y); //Si estamos en tiempo de bonos entonces creamos manzanas como locos, pero estas manzanas solo sean normales.
-                manzana[index].push(new Apple(
-                        new Dim(
-                            x,
-                            y,
-                            14,
-                            14
-                        ),
-                        type,
-                        Apple.get_color[type]
-                    )
-                );
-            }
-            /***Apple.power: Es una función estática usada para determinar el poder de la manzana y tratar sus efectos.
-            @param type: Tipo de manzana.
-            @return {bool}
-             */
-            Apple.power = function (apple, snake, ctx) {
-                let msg = "yumin",
-                dim_snake = snake.dims[snake.dims.length - 1];
-                switch (apple.type) {
-                case APPLE_NORMAL:
-                    snake.score += 100;
-                    snake.create(10);
-                    break;
-                case APPLE_DEATH: //Quita puntos, vidas y una cola del jugador: Debe ser de color negro.
-                    snake.score += 500;
-                    if (!snake.is_ghost && snake.dims.length > 1) { //Si hay cola por destruir entonces la destruimos. //Si la serpiente esta en modo fantasma entonces no perderá vida.
-                        snake.life--;
-                        snake.dims = remove_indice(snake.dims, snake.dims.length - 1); //Recorto la cola de la serpiente.
-                    } else if (!snake.is_ghost) { //Si no , le quitamos dos vidas a la serpiente.
-                        snake.life -= 2;
-                    }
-                    msg = "OUCH!!!!!!";
-                    break;
-                case APPLE_GHOST: //Hacemos que la serpiente pueda tocarse su propia cola y atravesar las paredes durante un tiempo determinado.
-                    snake.is_ghost = true;
-                    setTimeout(function () {
-                        snake.is_ghost = false;
-                    }, TIME_GHOST);
-                    msg = "Me siento invencible.";
-                    break;
-                case APPLE_ROCK: //Hace que pierda una vida.
-                    if (!snake.is_ghost)
-                        snake.life--;
-                    snake.score += 150;
-                    msg = "Auch";
-                    break;
-                case APPLE_PINK_HEART:
-                    snake.life++;
-                    msg = "Me siento con mas fuerzas.:)";
-                    break;
-                case APPLE_BONUS: //Hace que el interval_gameo de tiempo de la creación de la manzana se reduzca considerablemente.
-                    Apple.is_bonus += time_bonus;
-                    if (Apple.is_bonus == time_bonus) {
-                        clearInterval(Apple.interval);
-                        Apple.interval = setInterval(create_manzana, Apple.is_bonus);
-                    }
-                    msg = "Creo que se acerca un buen banquete.:)-";
-                    break;
-                default:
-                    console.warn("Advertencia: Se pasó type=" + type + ", pero los poderes que están definidos están en un rango de 0-" + Apple.MAX_TYPE_APPLE + ", por lo que su poder no tendrá ningún efecto en el juego.");
-                }
-                alert(msg) ///@todo Cambiar esta alerta por un dibujo de una serpiente diciendo esto comiendo una manzana.
-                return (snake.life < 1) ? true : false;
-            }
-        </script>
-    </body>
+        //ponemos el canvas del tamaño de la pantalla.
+        //Nota quiero ponerlo más pequeño y agregar más detalles a la presentación.
+        canvas.setAttribute("width", MAX_WIDTH_CANVAS);
+        canvas.setAttribute("height", MAX_HEIGHT_CANVAS);
+        //Hacemos que el contenedor de pausa ocupe todo el canvas.
+        canvas_container.style.setProperty("--MAX-WIDTH-CANVAS", MAX_WIDTH_CANVAS + "px")
+        canvas_container.style.setProperty("--MAX-HEIGHT-CANVAS", MAX_HEIGHT_CANVAS + "px")
+        ///@todo Hacer que esta función se use por todos los eventos y darle una adaptación especial a evento touch.
+        
+        canvas.addEventListener("mousemove", function (e) {
+          if (!mouse_move)
+            return; 
+          //Creamos un flag que dirá si el mouse esta menor o igual a la posición X y Y de la serpiente.
+          let is_x = (snake.x == e.clientX) ? SQUAL : (e.clientX > snake.x) ? MAYOR : MENOR; //Mayor significa RIGHT
+          let is_y = (snake.y == e.clientY) ? SQUAL : (e.clientY > snake.y) ? MAYOR : MENOR; //Mayor significa BOTTOM.
+          let dis_x = (is_x == MAYOR) ? e.clientX - snake.x : snake.x - e.clientX;
+          let dis_y = (is_y == MAYOR) ? e.clientY - snake.y : snake.y - e.clientY;
+          if (dis_x > dis_y) {
+            snake.address = (is_x == MAYOR) ? RIGHT : LEFT;
+          } else {
+            snake.address = (is_y == MAYOR) ? BOTTOM : TOP;
+          }
+        });
+        ctx = canvas.getContext("2d"); //Obtenemos nuestro contexto 2d.
+      };
+      //Para iniciar el juego:
+      function init_game_button(id_for_return) {
+        //Preparamos la variables que nos permitirá establecer una forma de regresar al la pantalla anterior
+        id_previous = "init";
+        id_now = "game-container";
+        //Desaparecemos y aparecemos los elementos que necesitamos.
+        document.getElementById(id_previous).style.display = "none";
+        //Aparecemos nuestro lienzo para el juego.
+        document.getElementById(id_now).style.display = "flex";
+        //Frecha de retorno.
+        document.getElementById(id_for_return).style.display = "block";
+        function_for_return = function () { //Personalizamos para detener los intervalos del juego.
+          //Si el usuario no quiere terminar el juego le damos una advertencia.
+          if (!confirm("¿Seguro que deseas terminar el Juego, pueden perderse datos?.")) {
+            return false;
+          }
+          function_for_return = GET_TRUE;// Se salió
+          //Liberamos la memoria innecesaria.
+          end_game();
+          return true;
+        }
+        document.body.addEventListener("keydown", function (e) {
+          /***@todo: hacer que cuando se regrese del juego este evento cambie a otro que controle los botones.*/
+          e.keyCode = (e.keyCode >= 'A' && e.keyCode <= 'Z') ? (95 - e.keyCode) + 32 : e.keyCode;
+          switch (e.keyCode) {
+            case LEFT: // <-
+            snake.address = Snake.LEFT;
+            break;
+          case RIGHT: // ->
+            snake.address = Snake.RIGHT;
+            break;
+          case TOP: // ^
+            snake.address = Snake.TOP;
+            break;
+          case BOTTOM: // \/
+            snake.address = Snake.BOTTOM;
+            break;
+          case PAUSE: //Key p is pause
+            pause();
+            break;
+          default: /***@todo; cuando tengas toda esta función lista, quitar este default.*/
+            if (is_game_over)
+              break;
+            if (e.keyCode == ENTER)
+              pause();
+            return;
+          }
+        });
+        start_game();
+      }
+      function pause() {
+        document.getElementById("msg-pause-game").style.display = (!is_pause) ? "flex" : "none";
+        is_pause = !is_pause;
+      }
+      /** Intercambiamos la escena.
+       * 
+       * @param {string} id_padre_this Escena a poner
+      */
+      function escene_previous(id_padre_this) {
+        if (!function_for_return())
+          return;
+        let change = id_previous;
+        document.getElementById(id_previous).style.display = "block";
+        document.getElementById(id_now).style.display = "none";
+        if (id_previous === "init") { // Si estamos en el inicio, entonces no necesitamos este menú y lo desaparecemos.
+          document.getElementById(id_padre_this).style.display = "none";
+        }
+        id_previous = id_now;
+        id_now = change;
+      }
+      /** Muestra el menu de ayuda*/
+      function help(now, id_menu_return) {
+        let for_hidden = document.getElementById(now);
+        let for_visible = document.getElementById("help");
+        for_visible.style.display = "block";
+        for_hidden.style.display = "none";
+        document.getElementById(id_menu_return).style.display = "block";
+        id_previous = now;
+        id_now = "help";
+      }
+      function start_game() {
+        let this_ = document.getElementById("game-over");
+        this_.style.display = "none";
+        //Iniciamos otra vez el juego.
+        ///@todo Ver si se puede aumentar el tamaño de la serpiente y no te olvides de alterar la velocidad en la funcion game.
+        snake = new Snake(
+          MAX_WIDTH_CANVAS >> 1, MAX_HEIGHT_CANVAS >> 1,// x y
+          10, 10 // w y h
+        );
+        //Creamos la primera manzana.
+        Apple.create_manzana(); //Iniciamos la función que crea manzanas.
+        Apple.interval = setInterval(Apple.create_manzana, time_create_apple);
+        //Ponemos a la serpiente al la mita de la pantalla.
+        interval_game = setInterval(game, time_game); //Iniciamos el juego.
+        is_game_over = false;
+      }
+      function end_game() {
+        let this_ = document.getElementById("game-over");
+        this_.style.display = "flex";
+        clearInterval(interval_game);
+        clearInterval(Apple.interval);
+        //Limpiamos el canvas.
+        ctx.clearRect(0, 0, MAX_WIDTH_CANVAS, MAX_HEIGHT_CANVAS);
+        //Vaciamos la memoria.
+        snake = 0;
+        apple=null;
+        is_game_over = true;
+        Apple.bonus = 0;
+      }
+    </script>
+  </body>
 </html>
